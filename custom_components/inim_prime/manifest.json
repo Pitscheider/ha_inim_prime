@@ -1,0 +1,10 @@
+{
+  "domain": "inim_prime",
+  "name": "INIM Prime",
+  "version": "0.1.0",
+  "documentation": "https://github.com/YOUR_GITHUB/inim-prime",
+  "codeowners": ["@yourgithub"],
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "logo": "icon.png"
+}

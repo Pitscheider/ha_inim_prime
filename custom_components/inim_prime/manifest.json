@@ -1,7 +1,7 @@
 {
   "domain": "inim_prime",
   "name": "INIM Prime",
-  "version": "0.1.0",
+  "version": "0.0.1-alpha",
   "documentation": "https://github.com/YOUR_GITHUB/inim-prime",
   "codeowners": ["@yourgithub"],
   "config_flow": true,

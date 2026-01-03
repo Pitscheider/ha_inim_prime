@@ -1,5 +1,6 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.zone_sensors import ZoneStateSensor
+from custom_components.inim_prime.entities.zones import ZoneStateSensor
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]

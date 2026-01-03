@@ -14,13 +14,9 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
     entities = []
 
     zones = coordinator.data.zones
-    areas = coordinator.data.areas
 
     for zone in zones.values():
         entities.append(ZoneStateBinarySensor(coordinator, zone))
         entities.append(ZoneAlarmMemoryBinarySensor(coordinator, zone))
-
-    for area in areas.values():
-        entities.append(AreaStateSensor(coordinator, area))
 
     async_add_entities(entities, update_before_add=True)

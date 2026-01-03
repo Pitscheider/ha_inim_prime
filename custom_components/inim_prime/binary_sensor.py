@@ -17,6 +17,5 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
     for zone in zones.values():
         entities.append(ZoneStateBinarySensor(coordinator, zone))
         entities.append(ZoneAlarmMemoryBinarySensor(coordinator, zone))
-        entities.append(ZoneExcludedBinarySensor(coordinator, zone))
 
     async_add_entities(entities, update_before_add=True)

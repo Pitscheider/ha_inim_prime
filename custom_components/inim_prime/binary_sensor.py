@@ -1,7 +1,7 @@
 from typing import Dict, Any
 
 from inim_prime.models import ZoneStatus
-from .sensors.zone_sensors import ZoneStateSensor, ZoneAlarmMemoryBinarySensor, ZoneExcludedBinarySensor, \
+from .entities.zone_sensors import ZoneStateSensor, ZoneAlarmMemoryBinarySensor, ZoneExcludedBinarySensor, \
     ZoneStateBinarySensor
 from .coordinator import InimPrimeDataUpdateCoordinator
 

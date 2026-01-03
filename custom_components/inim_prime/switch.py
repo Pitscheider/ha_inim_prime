@@ -1,5 +1,6 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.zone_sensors import ZoneStateSensor
+from custom_components.inim_prime.entities.zones import ZoneExclusionSwitch
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
@@ -8,7 +9,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     entities = []
 
     for zone in zones.values():
-        entities.append(ZoneStateSensor(coordinator, zone))
-
+        entities.append(ZoneExclusionSwitch(coordinator, zone))
 
     async_add_entities(entities, update_before_add=True)

@@ -18,7 +18,7 @@ def create_zone_device_info(
     )
 
 
-class ZoneStateBinarySensor(CoordinatorEntity, BinarySensorEntity):
+class ZoneStateBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
         super().__init__(coordinator)
 
@@ -33,16 +33,16 @@ class ZoneStateBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        zones = self.coordinator.data.get("zones", [])
-        zone = next((z for z in zones if z.id == self.zone_id), None)
+        zone = self.coordinator.data.zones.get(self.zone_id)
+
         if zone:
             if zone.state == ZoneState.ALARM:
                 return True
-            elif zone.state == ZoneState.READY:
+            if zone.state == ZoneState.READY:
                 return False
         return None
 
-class ZoneStateSensor(CoordinatorEntity, SensorEntity):
+class ZoneStateSensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], SensorEntity):
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
         super().__init__(coordinator)
 
@@ -59,12 +59,13 @@ class ZoneStateSensor(CoordinatorEntity, SensorEntity):
         )
 
     @property
-    def native_value(self) -> str:
-        zones: list[ZoneStatus] = self.coordinator.data.get("zones", [])
-        zone = next((z for z in zones if z.id == self.zone_id), None)
-        return zone.state.name
+    def native_value(self) -> str | None:
+        zone = self.coordinator.data.zones.get(self.zone_id)
+        if zone:
+            return zone.state.name
+        return None
 
-class ZoneAlarmMemoryBinarySensor(CoordinatorEntity, BinarySensorEntity):
+class ZoneAlarmMemoryBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
     """Binary sensor per l'alarm memory della zona."""
 
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
@@ -82,14 +83,13 @@ class ZoneAlarmMemoryBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        zones = self.coordinator.data.get("zones", [])
-        zone = next((z for z in zones if z.id == self.zone_id), None)
+        zone = self.coordinator.data.zones.get(self.zone_id)
         if zone:
             return zone.alarm_memory
         return None
 
 
-class ZoneExcludedBinarySensor(CoordinatorEntity, BinarySensorEntity):
+class ZoneExcludedBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
         super().__init__(coordinator)
 
@@ -105,8 +105,7 @@ class ZoneExcludedBinarySensor(CoordinatorEntity, BinarySensorEntity):
 
     @property
     def is_on(self) -> bool | None:
-        zones = self.coordinator.data.get("zones", [])
-        zone = next((z for z in zones if z.id == self.zone_id), None)
+        zone = self.coordinator.data.zones.get(self.zone_id)
         if zone:
             return zone.excluded
         return None

@@ -5,11 +5,11 @@ from inim_prime.models import ZoneStatus
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    zones: list[ZoneStatus] = coordinator.data.get("zones", [])
+    zones = coordinator.data.zones
 
     entities = []
 
-    for zone in zones:
+    for zone in zones.values():
         entities.append(ZoneStateSensor(coordinator, zone))
 
 

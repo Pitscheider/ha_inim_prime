@@ -3,7 +3,7 @@ from typing import Dict, Any
 from inim_prime.models import ZoneStatus
 
 from .coordinator import InimPrimeDataUpdateCoordinator
-from .entities.zones import ZoneStateBinarySensor, ZoneExcludedBinarySensor, ZoneAlarmMemoryBinarySensor
+from .entities.zones import ZoneStateBinarySensor, ZoneAlarmMemoryBinarySensor
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:

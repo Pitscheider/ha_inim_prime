@@ -101,7 +101,7 @@ class ClearAreaAlarmMemoryButton(
         self.area_id = area.id
         self._attr_name = "Clear Alarm Memory"
         self._attr_unique_id = f"{DOMAIN}_area_{area.id}_clear_alarm_memory"
-        self._attr_icon = "mdi:alarm-off"
+        self._attr_icon = "mdi:alarm-light-off"
 
         self._attr_device_info = create_area_device_info(
             area_id=self.area_id,

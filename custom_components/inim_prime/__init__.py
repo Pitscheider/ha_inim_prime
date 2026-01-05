@@ -30,7 +30,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Forward setup alle piattaforme
     # Nuovo metodo corretto per HA 2025+
-    await hass.config_entries.async_forward_entry_setups(entry, ["binary_sensor", "sensor", "switch"])
+    await hass.config_entries.async_forward_entry_setups(entry, ["binary_sensor", "sensor", "switch", "select"])
 
     return True
 

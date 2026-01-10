@@ -1,7 +1,8 @@
-from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.components.button import ButtonEntity
 from homeassistant.components.select import SelectEntity
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.const import EntityCategory
 
 from inim_prime.models import AreaStatus, AreaState
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -119,13 +120,16 @@ class ClearAreaAlarmMemoryButton(
 
 class AreaAlarmMemoryBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
 
+    _attr_device_class = BinarySensorDeviceClass.PROBLEM
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:alarm-light"
+    _attr_name = "Alarm Memory"
+
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, area: AreaStatus):
         super().__init__(coordinator)
 
         self.area_id = area.id
-        self._attr_name = "Alarm Memory"
         self._attr_unique_id = f"{DOMAIN}_area_{area.id}_alarm_memory"
-        self._attr_icon = "mdi:alarm-light"
 
         self._attr_device_info = create_area_device_info(
             area_id = self.area_id,

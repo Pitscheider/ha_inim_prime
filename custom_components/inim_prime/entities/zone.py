@@ -1,6 +1,7 @@
-from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
+from homeassistant.const import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, INIM_PRIME_MODEL_ZONE
@@ -69,13 +70,17 @@ class ZoneStateSensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], SensorE
 class ZoneAlarmMemoryBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
     """Binary sensor per l'alarm memory della zona."""
 
+    _attr_device_class = BinarySensorDeviceClass.PROBLEM
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_name = "Alarm Memory"
+    _attr_icon = "mdi:alarm-light"
+
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_name = "Alarm Memory"
+
         self._attr_unique_id = f"{DOMAIN}_zone_{zone.id}_alarm_memory"
-        self._attr_icon = "mdi:alarm-light"
 
         self._attr_device_info = create_zone_device_info(
             zone_id=self.zone_id,

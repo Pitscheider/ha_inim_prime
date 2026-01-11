@@ -7,12 +7,14 @@ from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 
 def create_gsm_device_info(
     domain: str = DOMAIN,
+    sw_version: str = None
 ) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(domain, "gsm")},
         name="GSM",
         model="Prime",
         via_device=(domain, "panel"),
+        sw_version=sw_version
     )
 
 class GSMSupplyVoltageSensor(
@@ -28,7 +30,9 @@ class GSMSupplyVoltageSensor(
 
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator):
         super().__init__(coordinator)
-        self._attr_device_info = create_gsm_device_info()
+        self._attr_device_info = create_gsm_device_info(
+            sw_version= self.coordinator.data.gsm.firmware_version
+        )
 
     @property
     def native_value(self) -> float | None:

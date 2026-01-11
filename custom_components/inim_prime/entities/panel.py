@@ -15,9 +15,25 @@ def create_panel_device_info(
         model="Prime",
     )
 
+EXPOSED_SYSTEM_FAULTS: set[SystemFault] = {
+    SystemFault.LOW_BATTERY,
+    SystemFault.NETWORK_FAULT,
+    SystemFault.NO_TELEPHONE_LINE,
+    SystemFault.RADIO_JAMMING,
+    SystemFault.LOW_BATTERY_WIRELESS,
+    SystemFault.WIRELESS_DEVICE_DISAPPEARANCE,
+    SystemFault.GSM_FAULT,
+    SystemFault.SENSOR_DIRTY,
+    SystemFault.ZONE_FAULT,
+    SystemFault.SIRENS_FAULT,
+    SystemFault.POWER_SUPPLY_FAULT,
+    SystemFault.RADIO_KEYBOARDS_FAULT,
+    SystemFault.SABOTAGE_FAULT,
+    SystemFault.INTERNET_FAULT,
+}
+
+
 SYSTEM_FAULT_NAMES: dict[SystemFault, str] = {
-    SystemFault.AVAILABLE_1: "Available 1",
-    SystemFault.AVAILABLE_2: "Available 2",
     SystemFault.LOW_BATTERY: "Low Battery",
     SystemFault.NETWORK_FAULT: "Network Fault",
     SystemFault.NO_TELEPHONE_LINE: "No Telephone Line",
@@ -35,8 +51,6 @@ SYSTEM_FAULT_NAMES: dict[SystemFault, str] = {
 }
 
 SYSTEM_FAULT_ICONS: dict[SystemFault, str] = {
-    SystemFault.AVAILABLE_1: "mdi:check-circle-outline",
-    SystemFault.AVAILABLE_2: "mdi:check-circle-outline",
     SystemFault.LOW_BATTERY: "mdi:battery-alert",
     SystemFault.NETWORK_FAULT: "mdi:lan-disconnect",
     SystemFault.NO_TELEPHONE_LINE: "mdi:phone-off",

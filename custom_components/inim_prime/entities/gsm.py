@@ -1,4 +1,4 @@
-from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass, SensorStateClass
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -56,3 +56,25 @@ class GSMOperatorSensor(
     def native_value(self) -> str | None:
         gsm = self.coordinator.data.gsm
         return gsm.operator
+
+class GSMSignalStrengthSensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SensorEntity,
+):
+    _attr_name = "Signal Strength"
+    _attr_unique_id = f"{DOMAIN}_gsm_signal_strength"
+    _attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
+    _attr_native_unit_of_measurement = "dBm"
+    _attr_state_class = SensorStateClass.MEASUREMENT
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator):
+        super().__init__(coordinator)
+        self._attr_device_info = create_gsm_device_info(
+            sw_version= self.coordinator.data.gsm.firmware_version
+        )
+
+    @property
+    def native_value(self) -> float | None:
+        gsm = self.coordinator.data.gsm
+        return gsm.signal_strength_dbm

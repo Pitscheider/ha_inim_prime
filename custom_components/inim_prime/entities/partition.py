@@ -24,7 +24,8 @@ def create_partition_device_info(
         identifiers={(domain, f"{entry.entry_id}_partition_{partition_id}")},
         name=f"Partition {partition_name}",
         model="Partition",
-        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER
+        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
+        via_device=(domain, entry.entry_id),
     )
 
 class PartitionStateSensor(

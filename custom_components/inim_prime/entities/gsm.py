@@ -64,7 +64,7 @@ class GSMSignalStrengthSensor(
     _attr_name = "Signal Strength"
     _attr_unique_id = f"{DOMAIN}_gsm_signal_strength"
     _attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
-    _attr_native_unit_of_measurement = "dBm"
+    _attr_native_unit_of_measurement = "%"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -77,4 +77,4 @@ class GSMSignalStrengthSensor(
     @property
     def native_value(self) -> float | None:
         gsm = self.coordinator.data.gsm
-        return gsm.signal_strength_dbm
+        return gsm.signal_strength

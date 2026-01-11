@@ -42,7 +42,7 @@ class PartitionStateSensor(
 
         self.partition_id = partition.id
         self._attr_name = "State"
-        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_state"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_state"
         self._attr_device_class = SensorDeviceClass.ENUM
         self._attr_options = [state.name for state in PartitionState]
         self._attr_icon = "mdi:magnify"
@@ -79,7 +79,7 @@ class PartitionModeSelect(
         self.partition_id = partition.id
 
         self._attr_name = "Mode"
-        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_mode"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_mode"
         self._attr_icon = "mdi:shield-lock"
 
         # Options shown in UI
@@ -126,7 +126,7 @@ class ClearPartitionAlarmMemoryButton(
 
         self.partition_id = partition.id
         self._attr_name = "Clear Alarm Memory"
-        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_clear_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_clear_alarm_memory"
         self._attr_icon = "mdi:alarm-light-off"
 
         self._attr_device_info = create_partition_device_info(
@@ -162,7 +162,7 @@ class PartitionAlarmMemoryBinarySensor(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,

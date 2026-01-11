@@ -11,29 +11,48 @@ def create_panel_device_info(
 ) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(domain, "panel")},
-        name="INIM Prime Panel",
+        name="Prime Panel",
         model="Prime",
     )
 
 SYSTEM_FAULT_NAMES: dict[SystemFault, str] = {
+    SystemFault.AVAILABLE_1: "Available 1",
+    SystemFault.AVAILABLE_2: "Available 2",
     SystemFault.LOW_BATTERY: "Low Battery",
     SystemFault.NETWORK_FAULT: "Network Fault",
     SystemFault.NO_TELEPHONE_LINE: "No Telephone Line",
     SystemFault.RADIO_JAMMING: "Radio Jamming",
     SystemFault.LOW_BATTERY_WIRELESS: "Wireless Device Low Battery",
+    SystemFault.WIRELESS_DEVICE_DISAPPEARANCE: "Wireless Device Missing",
     SystemFault.GSM_FAULT: "GSM Fault",
-    SystemFault.INTERNET_FAULT: "Internet Fault",
+    SystemFault.SENSOR_DIRTY: "Sensor Dirty",
+    SystemFault.ZONE_FAULT: "Zone Fault",
+    SystemFault.SIRENS_FAULT: "Sirens Fault",
+    SystemFault.POWER_SUPPLY_FAULT: "Power Supply Fault",
+    SystemFault.RADIO_KEYBOARDS_FAULT: "Radio Keyboards Fault",
     SystemFault.SABOTAGE_FAULT: "Sabotage",
+    SystemFault.INTERNET_FAULT: "Internet Fault",
 }
 
 SYSTEM_FAULT_ICONS: dict[SystemFault, str] = {
+    SystemFault.AVAILABLE_1: "mdi:check-circle-outline",
+    SystemFault.AVAILABLE_2: "mdi:check-circle-outline",
     SystemFault.LOW_BATTERY: "mdi:battery-alert",
     SystemFault.NETWORK_FAULT: "mdi:lan-disconnect",
-    SystemFault.INTERNET_FAULT: "mdi:web-off",
+    SystemFault.NO_TELEPHONE_LINE: "mdi:phone-off",
+    SystemFault.RADIO_JAMMING: "mdi:signal-off",
+    SystemFault.LOW_BATTERY_WIRELESS: "mdi:battery-alert-variant",
+    SystemFault.WIRELESS_DEVICE_DISAPPEARANCE: "mdi:access-point-off",
     SystemFault.GSM_FAULT: "mdi:signal-off",
+    SystemFault.SENSOR_DIRTY: "mdi:spray",
+    SystemFault.ZONE_FAULT: "mdi:map-marker-alert",
+    SystemFault.SIRENS_FAULT: "mdi:alarm-light-outline",
     SystemFault.POWER_SUPPLY_FAULT: "mdi:flash-alert",
+    SystemFault.RADIO_KEYBOARDS_FAULT: "mdi:keyboard-off",
     SystemFault.SABOTAGE_FAULT: "mdi:alert-octagon",
+    SystemFault.INTERNET_FAULT: "mdi:web-off",
 }
+
 
 
 class SystemFaultBinarySensor(

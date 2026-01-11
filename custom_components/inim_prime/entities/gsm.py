@@ -87,7 +87,7 @@ class GSMCreditSensor(
     _attr_name = "Credit"
     _attr_unique_id = f"{DOMAIN}_gsm_credit"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
-    _attr_icon = "mdi:currency-eur"
+    _attr_icon = "mdi:cash-multiple"
 
     def __init__(self, coordinator: InimPrimeDataUpdateCoordinator):
         super().__init__(coordinator)

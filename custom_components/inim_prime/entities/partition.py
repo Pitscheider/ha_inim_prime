@@ -26,6 +26,7 @@ def create_partition_device_info(
         model="Partition",
         manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
         via_device=(domain, entry.entry_id),
+        serial_number=f"partition_{partition_id}"
     )
 
 class PartitionStateSensor(

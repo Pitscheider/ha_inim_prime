@@ -1,4 +1,5 @@
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -88,3 +89,25 @@ class SystemFaultBinarySensor(
     def is_on(self) -> bool:
         system_faults = self.coordinator.data.system_faults
         return system_faults.has_fault(self._fault)
+
+class PanelSupplyVoltageSensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SensorEntity,
+):
+    """Sensor for the panel's supply voltage."""
+
+    _attr_name = "Supply Voltage"
+    _attr_unique_id = f"{DOMAIN}_panel_supply_voltage"
+    _attr_device_class = SensorDeviceClass.VOLTAGE
+    _attr_native_unit_of_measurement = "V"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator):
+        super().__init__(coordinator)
+        self._attr_device_info = create_panel_device_info()
+
+    @property
+    def native_value(self) -> float | None:
+        """Return the supply voltage."""
+        system_faults = self.coordinator.data.system_faults
+        return system_faults.supply_voltage

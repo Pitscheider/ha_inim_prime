@@ -16,7 +16,7 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class PanelData:
-    system_faults: SystemFaultsStatus = SystemFaultsStatus
+    system_faults: SystemFaultsStatus = SystemFaultsStatus(supply_voltage=None, faults=frozenset())
     zones: Dict[int, ZoneStatus] = field(default_factory=dict)
     areas: Dict[int, AreaStatus] = field(default_factory=dict)
     outputs: Dict[int, OutputStatus] = field(default_factory=dict)

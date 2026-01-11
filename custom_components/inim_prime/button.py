@@ -8,6 +8,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
     entities = []
 
     for partition in partitions.values():
-        entities.append(ClearPartitionAlarmMemoryButton(coordinator, partition))
+        entities.append(ClearPartitionAlarmMemoryButton(coordinator, entry, partition))
 
     async_add_entities(entities, update_before_add=True)

@@ -1,7 +1,4 @@
-from typing import Dict, Any
-
-from inim_prime.models import ZoneStatus
-from inim_prime.models.system_faults import SystemFault, EXPOSED_SYSTEM_FAULTS
+from inim_prime.models.system_faults import EXPOSED_SYSTEM_FAULTS
 
 from .coordinator import InimPrimeDataUpdateCoordinator
 from .entities.panel import SystemFaultBinarySensor
@@ -23,7 +20,7 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
         entities.append(ZoneAlarmMemoryBinarySensor(coordinator, zone))
 
     for partition in partitions.values():
-        entities.append(PartitionAlarmMemoryBinarySensor(coordinator, partition))
+        entities.append(PartitionAlarmMemoryBinarySensor(coordinator, entry, partition))
 
     for exposedSystemFault in EXPOSED_SYSTEM_FAULTS:
         entities.append(

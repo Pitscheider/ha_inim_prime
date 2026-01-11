@@ -6,6 +6,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
+from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER
 from inim_prime.models.system_faults import SystemFault
 
 def create_panel_device_info(
@@ -14,9 +15,9 @@ def create_panel_device_info(
 ) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(domain, entry.entry_id)},
-        name="Panel",
-        model="Prime",
-
+        name="Inim Prime Panel",
+        model="Prime Panel",
+        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER
     )
 
 

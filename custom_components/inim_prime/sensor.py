@@ -16,7 +16,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         entities.append(ZoneStateSensor(coordinator, zone))
 
     for partition in partitions.values():
-        entities.append(PartitionStateSensor(coordinator, partition))
+        entities.append(PartitionStateSensor(coordinator, entry, partition))
 
     entities.append(PanelSupplyVoltageSensor(coordinator,entry))
     entities.append(GSMSupplyVoltageSensor(coordinator))

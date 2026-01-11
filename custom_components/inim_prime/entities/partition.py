@@ -1,0 +1,144 @@
+from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
+from homeassistant.components.button import ButtonEntity
+from homeassistant.components.select import SelectEntity
+from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
+from homeassistant.const import EntityCategory
+
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
+from homeassistant.helpers.entity import DeviceInfo
+
+from inim_prime.models.partition import SetPartitionModeRequest, PartitionMode, ClearPartitionAlarmMemoryRequest, \
+    PartitionState, PartitionStatus
+
+
+def create_partition_device_info(
+    partition_id: int,
+    partition_name: str,
+    domain: str = DOMAIN,
+) -> DeviceInfo:
+    return DeviceInfo(
+        identifiers={(domain, f"partition_{partition_id}")},
+        name=f"Partition {partition_name}",
+        model="Prime Partition",
+    )
+
+class PartitionStateSensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], SensorEntity):
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, partition: PartitionStatus):
+        super().__init__(coordinator)
+
+        self.partition_id = partition.id
+        self._attr_name = "State"
+        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_state"
+        self._attr_device_class = SensorDeviceClass.ENUM
+        self._attr_options = [state.name for state in PartitionState]
+        self._attr_icon = "mdi:magnify"
+
+        self._attr_device_info = create_partition_device_info(
+            partition_id = self.partition_id,
+            partition_name = partition.name,
+        )
+
+
+    @property
+    def native_value(self) -> str | None:
+        partition = self.coordinator.data.partitions.get(self.partition_id)
+        if partition:
+            return partition.state.name
+        return None
+
+
+class PartitionModeSelect(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SelectEntity,
+):
+    """Select entity to control partition arming mode."""
+
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, partition):
+        super().__init__(coordinator)
+
+        self.partition_id = partition.id
+
+        self._attr_name = "Mode"
+        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_mode"
+        self._attr_icon = "mdi:shield-lock"
+
+        # Options shown in UI
+        self._attr_options = [mode.name for mode in PartitionMode]
+
+        self._attr_device_info = create_partition_device_info(
+            partition_id=self.partition_id,
+            partition_name=partition.name,
+        )
+
+    @property
+    def current_option(self) -> str | None:
+        """Return the current partition mode."""
+        partition = self.coordinator.data.partitions.get(self.partition_id)
+        if partition:
+            return partition.mode.name
+        return None
+
+    async def async_select_option(self, option: str) -> None:
+        """Set a new partition mode."""
+        mode = PartitionMode[option]
+
+        request = SetPartitionModeRequest(
+            partition_id=self.partition_id,
+            mode=mode,
+        )
+
+        await self.coordinator.client.set_partition_mode(request)
+        await self.coordinator.async_request_refresh()
+
+
+class ClearPartitionAlarmMemoryButton(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    ButtonEntity,
+):
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, partition):
+        super().__init__(coordinator)
+
+        self.partition_id = partition.id
+        self._attr_name = "Clear Alarm Memory"
+        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_clear_alarm_memory"
+        self._attr_icon = "mdi:alarm-light-off"
+
+        self._attr_device_info = create_partition_device_info(
+            partition_id=self.partition_id,
+            partition_name=partition.name,
+        )
+
+    async def async_press(self) -> None:
+        request = ClearPartitionAlarmMemoryRequest(
+            partition_id=self.partition_id,
+        )
+
+        await self.coordinator.client.clear_partition_alarm_memory(request)
+        await self.coordinator.async_request_refresh()
+
+
+class PartitionAlarmMemoryBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
+
+    _attr_device_class = BinarySensorDeviceClass.PROBLEM
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+    _attr_icon = "mdi:alarm-light"
+    _attr_name = "Alarm Memory"
+
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, partition: PartitionStatus):
+        super().__init__(coordinator)
+
+        self.partition_id = partition.id
+        self._attr_unique_id = f"{DOMAIN}_partition_{partition.id}_alarm_memory"
+
+        self._attr_device_info = create_partition_device_info(
+            partition_id = self.partition_id,
+            partition_name = partition.name,
+        )
+
+    @property
+    def is_on(self) -> bool | None:
+        partition = self.coordinator.data.partitions.get(self.partition_id)
+        if partition:
+            return partition.alarm_memory
+        return None

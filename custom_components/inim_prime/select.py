@@ -1,12 +1,13 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.area import AreaModeSelect
+from custom_components.inim_prime.entities.partition import PartitionModeSelect
+
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    areas = coordinator.data.areas
+    partitions = coordinator.data.partitions
     entities = []
 
-    for area in areas.values():
-        entities.append(AreaModeSelect(coordinator, area))
+    for partition in partitions.values():
+        entities.append(PartitionModeSelect(coordinator, partition))
 
     async_add_entities(entities, update_before_add=True)

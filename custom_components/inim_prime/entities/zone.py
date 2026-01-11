@@ -4,7 +4,6 @@ from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, INIM_PRIME_MODEL_ZONE
 from inim_prime.models import ZoneState, ZoneStatus, ZoneExclusionSetRequest
 from homeassistant.helpers.entity import DeviceInfo
 
@@ -17,6 +16,7 @@ def create_zone_device_info(
         identifiers={(domain, f"zone_{zone_id}")},
         name=f"Zone {zone_name}",
         model="Prime Zone",
+        via_device=(domain, "panel"),
     )
 
 

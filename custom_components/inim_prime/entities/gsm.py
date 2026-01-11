@@ -14,7 +14,7 @@ def create_gsm_device_info(
         name="GSM",
         model="Prime",
         via_device=(domain, "panel"),
-        sw_version=sw_version
+        sw_version=sw_version,
     )
 
 class GSMSupplyVoltageSensor(

@@ -8,7 +8,8 @@ from datetime import timedelta
 from voluptuous import default_factory
 
 from inim_prime import InimPrimeClient
-from inim_prime.models import AreaStatus, OutputStatus, SystemFaultsStatus, GSMSStatus
+from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus
+from inim_prime.models.partition import PartitionStatus
 from inim_prime.models.zone import ZoneStatus
 import logging
 
@@ -16,10 +17,11 @@ _LOGGER = logging.getLogger(__name__)
 
 @dataclass
 class PanelData:
+
     system_faults: SystemFaultsStatus = SystemFaultsStatus(supply_voltage=None, faults=frozenset())
     gsm: GSMSStatus = GSMSStatus(supply_voltage=None, firmware_version=None, operator=None, signal_strength=None, credit=None)
     zones: Dict[int, ZoneStatus] = field(default_factory=dict)
-    areas: Dict[int, AreaStatus] = field(default_factory=dict)
+    partitions: Dict[int, PartitionStatus] = field(default_factory=dict)
     outputs: Dict[int, OutputStatus] = field(default_factory=dict)
 
 class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[PanelData]):
@@ -39,18 +41,18 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[PanelData]):
         """Fetch data from API."""
         try:
             zones = await self.client.get_zones_status()
-            areas = await self.client.get_areas_status()
+            partitions = await self.client.get_partitions_status()
             outputs = await self.client.get_outputs_status()
             system_faults = await self.client.get_system_faults_status()
             gsm = await self.client.get_gsm_status()
 
             self.data.zones = zones
-            self.data.areas = areas
+            self.data.partitions = partitions
             self.data.outputs = outputs
             self.data.system_faults = system_faults
             self.data.gsm = gsm
 
-            # Optionally fetch areas, outputs, etc.
+            # Optionally fetch partitions, outputs, etc.
             return self.data
         except Exception as err:
             raise UpdateFailed(err) from err

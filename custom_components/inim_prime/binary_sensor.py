@@ -1,11 +1,11 @@
 from typing import Dict, Any
 
 from inim_prime.models import ZoneStatus
-from inim_prime.models.system_faults import SystemFault
+from inim_prime.models.system_faults import SystemFault, EXPOSED_SYSTEM_FAULTS
 
 from .coordinator import InimPrimeDataUpdateCoordinator
 from .entities.area import AreaStateSensor, AreaAlarmMemoryBinarySensor
-from .entities.panel import SystemFaultBinarySensor, EXPOSED_SYSTEM_FAULTS
+from .entities.panel import SystemFaultBinarySensor
 from .entities.zone import ZoneStateBinarySensor, ZoneAlarmMemoryBinarySensor
 
 

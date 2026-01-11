@@ -15,22 +15,6 @@ def create_panel_device_info(
         model="Prime",
     )
 
-EXPOSED_SYSTEM_FAULTS: set[SystemFault] = {
-    SystemFault.LOW_BATTERY,
-    SystemFault.NETWORK_FAULT,
-    SystemFault.NO_TELEPHONE_LINE,
-    SystemFault.RADIO_JAMMING,
-    SystemFault.LOW_BATTERY_WIRELESS,
-    SystemFault.WIRELESS_DEVICE_DISAPPEARANCE,
-    SystemFault.GSM_FAULT,
-    SystemFault.SENSOR_DIRTY,
-    SystemFault.ZONE_FAULT,
-    SystemFault.SIRENS_FAULT,
-    SystemFault.POWER_SUPPLY_FAULT,
-    SystemFault.RADIO_KEYBOARDS_FAULT,
-    SystemFault.SABOTAGE_FAULT,
-    SystemFault.INTERNET_FAULT,
-}
 
 
 SYSTEM_FAULT_NAMES: dict[SystemFault, str] = {

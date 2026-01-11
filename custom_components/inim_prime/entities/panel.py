@@ -12,7 +12,7 @@ def create_panel_device_info(
 ) -> DeviceInfo:
     return DeviceInfo(
         identifiers={(domain, "panel")},
-        name="Prime Panel",
+        name="Panel",
         model="Prime",
     )
 
@@ -111,3 +111,4 @@ class PanelSupplyVoltageSensor(
         """Return the supply voltage."""
         system_faults = self.coordinator.data.system_faults
         return system_faults.supply_voltage
+

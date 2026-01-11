@@ -1,5 +1,6 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.entities.area import AreaStateSensor
+from custom_components.inim_prime.entities.gsm import GSMSupplyVoltageSensor
 from custom_components.inim_prime.entities.panel import PanelSupplyVoltageSensor
 from custom_components.inim_prime.entities.zone import ZoneStateSensor
 
@@ -17,5 +18,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
         entities.append(AreaStateSensor(coordinator, area))
 
     entities.append(PanelSupplyVoltageSensor(coordinator))
+    entities.append(GSMSupplyVoltageSensor(coordinator))
 
     async_add_entities(entities, update_before_add=True)

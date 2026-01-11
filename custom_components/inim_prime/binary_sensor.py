@@ -27,7 +27,7 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
 
     for exposedSystemFault in EXPOSED_SYSTEM_FAULTS:
         entities.append(
-            SystemFaultBinarySensor(coordinator, exposedSystemFault)
+            SystemFaultBinarySensor(coordinator, entry, exposedSystemFault)
         )
 
     async_add_entities(entities, update_before_add=True)

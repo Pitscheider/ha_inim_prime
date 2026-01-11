@@ -1,5 +1,6 @@
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -8,12 +9,14 @@ from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from inim_prime.models.system_faults import SystemFault
 
 def create_panel_device_info(
+    entry: ConfigEntry,
     domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, "panel")},
+        identifiers={(domain, entry.entry_id)},
         name="Panel",
         model="Prime",
+
     )
 
 
@@ -66,6 +69,7 @@ class SystemFaultBinarySensor(
     def __init__(
         self,
         coordinator: InimPrimeDataUpdateCoordinator,
+        entry: ConfigEntry,
         fault: SystemFault,
     ):
         super().__init__(coordinator)
@@ -83,7 +87,7 @@ class SystemFaultBinarySensor(
             "mdi:alert-circle",
         )
 
-        self._attr_device_info = create_panel_device_info()
+        self._attr_device_info = create_panel_device_info(entry)
 
     @property
     def is_on(self) -> bool:
@@ -102,9 +106,13 @@ class PanelSupplyVoltageSensor(
     _attr_native_unit_of_measurement = "V"
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
-    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator):
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+    ):
         super().__init__(coordinator)
-        self._attr_device_info = create_panel_device_info()
+        self._attr_device_info = create_panel_device_info(entry)
 
     @property
     def native_value(self) -> float | None:

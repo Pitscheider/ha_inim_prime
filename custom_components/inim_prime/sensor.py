@@ -18,7 +18,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for partition in partitions.values():
         entities.append(PartitionStateSensor(coordinator, partition))
 
-    entities.append(PanelSupplyVoltageSensor(coordinator))
+    entities.append(PanelSupplyVoltageSensor(coordinator,entry))
     entities.append(GSMSupplyVoltageSensor(coordinator))
     entities.append(GSMOperatorSensor(coordinator))
     entities.append(GSMSignalStrengthSensor(coordinator))

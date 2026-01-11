@@ -78,3 +78,22 @@ class GSMSignalStrengthSensor(
     def native_value(self) -> float | None:
         gsm = self.coordinator.data.gsm
         return gsm.signal_strength
+
+class GSMCreditSensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SensorEntity,
+):
+    _attr_name = "Credit"
+    _attr_unique_id = f"{DOMAIN}_gsm_credit"
+    _attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator):
+        super().__init__(coordinator)
+        self._attr_device_info = create_gsm_device_info(
+            sw_version= self.coordinator.data.gsm.firmware_version
+        )
+
+    @property
+    def native_value(self) -> str | None:
+        gsm = self.coordinator.data.gsm
+        return gsm.credit

@@ -19,6 +19,6 @@ async def async_setup_entry(hass, entry, async_add_entities):
 
     entities.append(PanelSupplyVoltageSensor(coordinator))
     entities.append(GSMSupplyVoltageSensor(coordinator))
-    entities.append(GSMOperatorSensor)
+    entities.append(GSMOperatorSensor(coordinator))
 
     async_add_entities(entities, update_before_add=True)

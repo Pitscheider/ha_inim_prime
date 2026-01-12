@@ -3,7 +3,7 @@ import voluptuous as vol
 
 from homeassistant import config_entries
 from homeassistant.core import callback
-from homeassistant.helpers.selector import TextSelector, TextSelectorType
+from homeassistant.helpers.selector import TextSelector, TextSelectorType, TextSelectorConfig
 
 from custom_components.inim_prime.const import (
     CONF_HOST,
@@ -61,7 +61,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         schema = vol.Schema(
             {
                 vol.Required(CONF_HOST): str,
-                vol.Required(CONF_API_KEY): TextSelector(type = TextSelectorType.PASSWORD),
+                vol.Required(CONF_API_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
                 vol.Optional(CONF_USE_HTTPS, default=True): bool,
                 vol.Required(CONF_SERIAL_NUMBER): str,
             }

@@ -23,30 +23,30 @@ def create_partition_device_info(
     return DeviceInfo(
         identifiers={(domain, f"{entry.entry_id}_partition_{partition_id}")},
         name=f"Partition {partition_name}",
-        model="Partition",
+        model="Prime Partition",
         manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
         via_device=(domain, entry.entry_id),
-        serial_number=f"partition_{partition_id}"
     )
 
 class PartitionStateSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     SensorEntity,
 ):
+    _attr_name = "State"
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = [state.name for state in PartitionState]
+    _attr_icon = "mdi:magnify"
+
     def __init__(
             self,
             coordinator: InimPrimeDataUpdateCoordinator,
             entry: ConfigEntry,
-            partition: PartitionStatus
+            partition: PartitionStatus,
     ):
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_name = "State"
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_state"
-        self._attr_device_class = SensorDeviceClass.ENUM
-        self._attr_options = [state.name for state in PartitionState]
-        self._attr_icon = "mdi:magnify"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_state"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -67,7 +67,9 @@ class PartitionModeSelect(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     SelectEntity,
 ):
-    """Select entity to control partition arming mode."""
+    _attr_name = "Mode"
+    _attr_icon = "mdi:shield-lock"
+    _attr_options = [mode.name for mode in PartitionMode]
 
     def __init__(
             self,
@@ -78,13 +80,7 @@ class PartitionModeSelect(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-
-        self._attr_name = "Mode"
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_mode"
-        self._attr_icon = "mdi:shield-lock"
-
-        # Options shown in UI
-        self._attr_options = [mode.name for mode in PartitionMode]
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_mode"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -117,6 +113,9 @@ class ClearPartitionAlarmMemoryButton(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     ButtonEntity,
 ):
+    _attr_name = "Clear Alarm Memory"
+    _attr_icon = "mdi:alarm-light-off"
+
     def __init__(
             self,
             coordinator: InimPrimeDataUpdateCoordinator,
@@ -126,9 +125,7 @@ class ClearPartitionAlarmMemoryButton(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_name = "Clear Alarm Memory"
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_clear_alarm_memory"
-        self._attr_icon = "mdi:alarm-light-off"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_clear_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -163,7 +160,7 @@ class PartitionAlarmMemoryBinarySensor(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{partition.id}_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,

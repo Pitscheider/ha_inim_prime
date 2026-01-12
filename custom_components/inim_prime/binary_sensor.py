@@ -16,8 +16,8 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
     partitions = coordinator.data.partitions
 
     for zone in zones.values():
-        entities.append(ZoneStateBinarySensor(coordinator, zone))
-        entities.append(ZoneAlarmMemoryBinarySensor(coordinator, zone))
+        entities.append(ZoneStateBinarySensor(coordinator, entry, zone))
+        entities.append(ZoneAlarmMemoryBinarySensor(coordinator, entry, zone))
 
     for partition in partitions.values():
         entities.append(PartitionAlarmMemoryBinarySensor(coordinator, entry, partition))

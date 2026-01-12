@@ -13,15 +13,15 @@ async def async_setup_entry(hass, entry, async_add_entities):
     entities = []
 
     for zone in zones.values():
-        entities.append(ZoneStateSensor(coordinator, zone))
+        entities.append(ZoneStateSensor(coordinator, entry, zone))
 
     for partition in partitions.values():
         entities.append(PartitionStateSensor(coordinator, entry, partition))
 
     entities.append(PanelSupplyVoltageSensor(coordinator,entry))
-    entities.append(GSMSupplyVoltageSensor(coordinator))
-    entities.append(GSMOperatorSensor(coordinator))
-    entities.append(GSMSignalStrengthSensor(coordinator))
-    entities.append(GSMCreditSensor(coordinator))
+    entities.append(GSMSupplyVoltageSensor(coordinator, entry))
+    entities.append(GSMOperatorSensor(coordinator, entry))
+    entities.append(GSMSignalStrengthSensor(coordinator, entry))
+    entities.append(GSMCreditSensor(coordinator, entry))
 
     async_add_entities(entities, update_before_add=True)

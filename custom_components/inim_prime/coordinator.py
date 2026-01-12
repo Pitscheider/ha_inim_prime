@@ -1,11 +1,8 @@
 from dataclasses import dataclass, field
-from typing import Dict, TypedDict
-
+from typing import Dict
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-import asyncio
 from datetime import timedelta
 
-from voluptuous import default_factory
 
 from inim_prime import InimPrimeClient
 from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus

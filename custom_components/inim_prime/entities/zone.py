@@ -1,36 +1,50 @@
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
+from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER
 from inim_prime.models import ZoneState, ZoneStatus, ZoneExclusionSetRequest
 from homeassistant.helpers.entity import DeviceInfo
 
 def create_zone_device_info(
+    entry: ConfigEntry,
     zone_id: int,
     zone_name: str,
     domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"zone_{zone_id}")},
+        identifiers={(domain, f"{entry.entry_id}_zone_{zone_id}")},
         name=f"Zone {zone_name}",
         model="Prime Zone",
-        via_device=(domain, "panel"),
+        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
+        via_device=(domain, entry.entry_id),
     )
 
 
-class ZoneStateBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
-    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
+class ZoneStateBinarySensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    BinarySensorEntity,
+):
+    _attr_name = None
+
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+            zone: ZoneStatus,
+    ):
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_name = None
-        self._attr_unique_id = f"{DOMAIN}_zone_{zone.id}_triggered"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_triggered"
 
         self._attr_device_info = create_zone_device_info(
-            zone_id=self.zone_id,
-            zone_name=zone.name,
+            entry = entry,
+            zone_id = self.zone_id,
+            zone_name = zone.name,
         )
 
     @property
@@ -44,20 +58,30 @@ class ZoneStateBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], B
                 return False
         return None
 
-class ZoneStateSensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], SensorEntity):
-    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
+class ZoneStateSensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SensorEntity,
+):
+    _attr_name = "State"
+    _attr_device_class = SensorDeviceClass.ENUM
+    _attr_options = [state.name for state in ZoneState]
+    _attr_icon = "mdi:magnify"
+
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+            zone: ZoneStatus,
+    ):
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_name = "State"
-        self._attr_unique_id = f"{DOMAIN}_zone_{zone.id}_state"
-        self._attr_device_class = SensorDeviceClass.ENUM
-        self._attr_options = [state.name for state in ZoneState]
-        self._attr_icon = "mdi:magnify"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_state"
 
         self._attr_device_info = create_zone_device_info(
-            zone_id=self.zone_id,
-            zone_name=zone.name,
+            entry = entry,
+            zone_id = self.zone_id,
+            zone_name = zone.name,
         )
 
     @property
@@ -67,24 +91,30 @@ class ZoneStateSensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], SensorE
             return zone.state.name
         return None
 
-class ZoneAlarmMemoryBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinator], BinarySensorEntity):
-    """Binary sensor per l'alarm memory della zona."""
-
+class ZoneAlarmMemoryBinarySensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    BinarySensorEntity,
+):
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_entity_category = EntityCategory.DIAGNOSTIC
     _attr_name = "Alarm Memory"
     _attr_icon = "mdi:alarm-light"
 
-    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone: ZoneStatus):
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+            zone: ZoneStatus,
+    ):
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-
-        self._attr_unique_id = f"{DOMAIN}_zone_{zone.id}_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_alarm_memory"
 
         self._attr_device_info = create_zone_device_info(
-            zone_id=self.zone_id,
-            zone_name=zone.name,
+            entry = entry,
+            zone_id = self.zone_id,
+            zone_name = zone.name,
         )
 
     @property
@@ -94,21 +124,29 @@ class ZoneAlarmMemoryBinarySensor(CoordinatorEntity[InimPrimeDataUpdateCoordinat
             return zone.alarm_memory
         return None
 
-class ZoneExclusionSwitch(CoordinatorEntity[InimPrimeDataUpdateCoordinator], SwitchEntity):
-    """Switch to include or exclude a zone from the panel."""
+class ZoneExclusionSwitch(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SwitchEntity,
+):
+    _attr_name = "Exclusion"
+    _attr_icon = "mdi:cancel"
+    _attr_device_class = SwitchDeviceClass.SWITCH
 
-    def __init__(self, coordinator: InimPrimeDataUpdateCoordinator, zone):
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+            zone: ZoneStatus,
+    ):
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_name = "Exclusion"
-        self._attr_unique_id = f"{DOMAIN}_zone_{zone.id}_exclusion"
-        self._attr_icon = "mdi:cancel"
-        self._attr_device_class = SwitchDeviceClass.SWITCH
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_exclusion"
 
         self._attr_device_info = create_zone_device_info(
-            zone_id=self.zone_id,
-            zone_name=zone.name,
+            entry = entry,
+            zone_id = self.zone_id,
+            zone_name = zone.name,
         )
 
     @property

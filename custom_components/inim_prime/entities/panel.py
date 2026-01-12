@@ -62,8 +62,6 @@ class SystemFaultBinarySensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     BinarySensorEntity,
 ):
-    """Binary sensor for a system fault."""
-
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_entity_category = EntityCategory.DIAGNOSTIC
 
@@ -78,13 +76,14 @@ class SystemFaultBinarySensor(
         self._fault = fault
 
         self._attr_name = SYSTEM_FAULT_NAMES.get(
-            fault,
-            fault.name.replace("_", " ").title()
+            self._fault,
+            self._fault.name.replace("_", " ").title()
         )
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_panel_fault_{fault.name.lower()}"
+
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_panel_system_fault_{self._fault.name.lower()}"
 
         self._attr_icon = SYSTEM_FAULT_ICONS.get(
-            fault,
+            self._fault,
             "mdi:alert-circle",
         )
 
@@ -99,10 +98,7 @@ class PanelSupplyVoltageSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     SensorEntity,
 ):
-    """Sensor for the panel's supply voltage."""
-
     _attr_name = "Supply Voltage"
-
     _attr_device_class = SensorDeviceClass.VOLTAGE
     _attr_native_unit_of_measurement = "V"
     _attr_entity_category = EntityCategory.DIAGNOSTIC

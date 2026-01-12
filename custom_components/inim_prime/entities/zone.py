@@ -39,7 +39,7 @@ class ZoneStateBinarySensor(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_triggered"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_triggered"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,
@@ -76,7 +76,7 @@ class ZoneStateSensor(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_state"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_state"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,
@@ -109,7 +109,7 @@ class ZoneAlarmMemoryBinarySensor(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_alarm_memory"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_alarm_memory"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,
@@ -141,7 +141,7 @@ class ZoneExclusionSwitch(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_exclusion"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_exclusion"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,

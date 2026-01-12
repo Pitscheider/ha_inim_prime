@@ -81,7 +81,7 @@ class SystemFaultBinarySensor(
             self._fault.name.replace("_", " ").title()
         )
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_panel_system_fault_{self._fault.name.lower()}"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_system_fault_{self._fault.name.lower()}"
 
         self._attr_icon = SYSTEM_FAULT_ICONS.get(
             self._fault,
@@ -111,7 +111,7 @@ class PanelSupplyVoltageSensor(
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_panel_supply_voltage"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_supply_voltage"
         self._attr_device_info = create_panel_device_info(entry)
 
     @property

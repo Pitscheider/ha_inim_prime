@@ -39,7 +39,7 @@ class GSMSupplyVoltageSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_supply_voltage"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_supply_voltage"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,
@@ -67,7 +67,7 @@ class GSMOperatorSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_operator"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_operator"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,
@@ -96,7 +96,7 @@ class GSMSignalStrengthSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_signal_strength"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_signal_strength"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,
@@ -123,7 +123,7 @@ class GSMCreditSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_credit"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_credit"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,

@@ -46,7 +46,7 @@ class PartitionStateSensor(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_state"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_state"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -80,7 +80,7 @@ class PartitionModeSelect(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_mode"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_mode"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -125,7 +125,7 @@ class ClearPartitionAlarmMemoryButton(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_clear_alarm_memory"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_clear_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -160,7 +160,7 @@ class PartitionAlarmMemoryBinarySensor(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_alarm_memory"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,

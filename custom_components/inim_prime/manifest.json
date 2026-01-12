@@ -1,6 +1,7 @@
 {
   "domain": "inim_prime",
   "name": "Inim Prime",
+  "version": "0.0.1-alpha",
   "documentation": "https://github.com/Pitscheider/ha_inim_prime",
   "codeowners": ["@Pitscheider"],
   "config_flow": true,

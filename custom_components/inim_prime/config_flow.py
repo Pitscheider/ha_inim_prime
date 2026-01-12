@@ -33,7 +33,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 await client.close()
 
                 return self.async_create_entry(
-                    title=f"INIM Prime ({conf_serial_number}",
+                    title=f"INIM Prime ({conf_serial_number})",
                     data = {
                         CONF_HOST: conf_host,
                         CONF_API_KEY: conf_api_key,
@@ -49,7 +49,10 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_HOST): str,
                 vol.Required(CONF_API_KEY): str,
                 vol.Optional(CONF_USE_HTTPS, default=True): bool,
-                vol.Required(CONF_SERIAL_NUMBER): str,
+                vol.Required(
+                    CONF_SERIAL_NUMBER,
+                    description = {"secret": True},
+                ): str,
             }
         )
 

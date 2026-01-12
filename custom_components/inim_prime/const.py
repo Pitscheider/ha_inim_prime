@@ -5,6 +5,7 @@ DOMAIN = "inim_prime"
 CONF_HOST = "host"
 CONF_API_KEY = "api_key"
 CONF_USE_HTTPS = "use_https"
+CONF_SERIAL_NUMBER = "serial_number"
 CONF_SCAN_INTERVAL = 30
 
 INIM_PRIME_DEVICE_MANUFACTURER = "Inim"

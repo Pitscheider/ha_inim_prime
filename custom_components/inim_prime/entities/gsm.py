@@ -5,7 +5,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER
+from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 
 
 def create_gsm_device_info(
@@ -14,11 +14,11 @@ def create_gsm_device_info(
     sw_version: str = None
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"{entry.entry_id}_gsm")},
+        identifiers={(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_gsm")},
         name="GSM",
         model="Prime GSM",
         manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
-        via_device=(domain, entry.entry_id),
+        via_device=(domain, entry.data[CONF_SERIAL_NUMBER]),
         sw_version=sw_version,
     )
 
@@ -38,7 +38,7 @@ class GSMSupplyVoltageSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_gsm_supply_voltage"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_supply_voltage"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,
@@ -66,7 +66,7 @@ class GSMOperatorSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_gsm_operator"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_operator"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,
@@ -95,7 +95,7 @@ class GSMSignalStrengthSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_gsm_signal_strength"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_signal_strength"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,
@@ -122,7 +122,7 @@ class GSMCreditSensor(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_gsm_credit"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_gsm_credit"
 
         self._attr_device_info = create_gsm_device_info(
             entry=entry,

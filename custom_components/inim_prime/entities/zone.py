@@ -5,7 +5,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER
+from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 from inim_prime.models import ZoneState, ZoneStatus, ZoneExclusionSetRequest
 from homeassistant.helpers.entity import DeviceInfo
 
@@ -16,11 +16,11 @@ def create_zone_device_info(
     domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"{entry.entry_id}_zone_{zone_id}")},
+        identifiers={(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{zone_id}")},
         name=f"Zone {zone_name}",
         model="Prime Zone",
         manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
-        via_device=(domain, entry.entry_id),
+        via_device=(domain, entry.data[CONF_SERIAL_NUMBER]),
     )
 
 
@@ -39,7 +39,7 @@ class ZoneStateBinarySensor(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_triggered"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_triggered"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,
@@ -76,7 +76,7 @@ class ZoneStateSensor(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_state"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_state"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,
@@ -109,7 +109,7 @@ class ZoneAlarmMemoryBinarySensor(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_alarm_memory"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,
@@ -141,7 +141,7 @@ class ZoneExclusionSwitch(
         super().__init__(coordinator)
 
         self.zone_id = zone.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_zone_{self.zone_id}_exclusion"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_zone_{self.zone_id}_exclusion"
 
         self._attr_device_info = create_zone_device_info(
             entry = entry,

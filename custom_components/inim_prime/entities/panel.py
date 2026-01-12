@@ -6,7 +6,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER
+from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 from inim_prime.models.system_faults import SystemFault
 
 def create_panel_device_info(
@@ -14,10 +14,11 @@ def create_panel_device_info(
     domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, entry.entry_id)},
-        name="Inim Prime Panel",
-        model="Prime Panel",
-        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER
+        identifiers={(domain, entry.data[CONF_SERIAL_NUMBER])},
+        name = "Inim Prime Panel",
+        model = "Prime Panel",
+        manufacturer = INIM_PRIME_DEVICE_MANUFACTURER,
+        serial_number = entry.data[CONF_SERIAL_NUMBER],
     )
 
 
@@ -80,7 +81,7 @@ class SystemFaultBinarySensor(
             self._fault.name.replace("_", " ").title()
         )
 
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_panel_system_fault_{self._fault.name.lower()}"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_panel_system_fault_{self._fault.name.lower()}"
 
         self._attr_icon = SYSTEM_FAULT_ICONS.get(
             self._fault,
@@ -109,7 +110,7 @@ class PanelSupplyVoltageSensor(
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_panel_supply_voltage"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_panel_supply_voltage"
         self._attr_device_info = create_panel_device_info(entry)
 
     @property

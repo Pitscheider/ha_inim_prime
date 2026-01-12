@@ -9,7 +9,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from homeassistant.helpers.entity import DeviceInfo
 
-from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER
+from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 from inim_prime.models.partition import SetPartitionModeRequest, PartitionMode, ClearPartitionAlarmMemoryRequest, \
     PartitionState, PartitionStatus
 
@@ -21,11 +21,11 @@ def create_partition_device_info(
     domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"{entry.entry_id}_partition_{partition_id}")},
+        identifiers={(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{partition_id}")},
         name=f"Partition {partition_name}",
         model="Prime Partition",
         manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
-        via_device=(domain, entry.entry_id),
+        via_device=(domain, entry.data[CONF_SERIAL_NUMBER]),
     )
 
 class PartitionStateSensor(
@@ -46,7 +46,7 @@ class PartitionStateSensor(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_state"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_state"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -80,7 +80,7 @@ class PartitionModeSelect(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_mode"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_mode"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -125,7 +125,7 @@ class ClearPartitionAlarmMemoryButton(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_clear_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_clear_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,
@@ -160,7 +160,7 @@ class PartitionAlarmMemoryBinarySensor(
         super().__init__(coordinator)
 
         self.partition_id = partition.id
-        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_partition_{self.partition_id}_alarm_memory"
+        self._attr_unique_id = f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_partition_{self.partition_id}_alarm_memory"
 
         self._attr_device_info = create_partition_device_info(
             entry = entry,

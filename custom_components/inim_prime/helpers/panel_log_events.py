@@ -1,6 +1,5 @@
 from typing import List
 
-from custom_components.inim_prime import InimPrimeDataUpdateCoordinator
 from inim_prime.models import LogEvent
 from datetime import datetime
 

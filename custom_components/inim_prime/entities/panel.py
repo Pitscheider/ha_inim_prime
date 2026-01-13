@@ -128,6 +128,7 @@ class PanelLogEvents(
     EventEntity,
 ):
     _attr_name = "Log Events"
+    _attr_event_types = ["generic"]
 
     def __init__(
         self,

@@ -1,11 +1,18 @@
 from dataclasses import dataclass, field
-from typing import Dict
+from typing import Dict, List, Any, Coroutine
+
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from datetime import timedelta
-
+from custom_components.inim_prime import DOMAIN
+from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
+    STORAGE_KEY_LAST_PANEL_EVENT_LOGS
+from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, serialize_panel_log_events
 
 from inim_prime import InimPrimeClient
-from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus
+from inim_prime.helpers.log_events import filter_new_log_events
+from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus, LogEvent
 from inim_prime.models.partition import PartitionStatus
 from inim_prime.models.zone import ZoneStatus
 import logging
@@ -13,18 +20,21 @@ import logging
 _LOGGER = logging.getLogger(__name__)
 
 @dataclass
-class PanelData:
-
+class CoordinatorData:
     system_faults: SystemFaultsStatus = SystemFaultsStatus(supply_voltage=None, faults=frozenset())
     gsm: GSMSStatus = GSMSStatus(supply_voltage=None, firmware_version=None, operator=None, signal_strength=None, credit=None)
     zones: Dict[int, ZoneStatus] = field(default_factory=dict)
     partitions: Dict[int, PartitionStatus] = field(default_factory=dict)
     outputs: Dict[int, OutputStatus] = field(default_factory=dict)
 
-class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[PanelData]):
-    """Coordinator to fetch data from the panel."""
 
-    def __init__(self, hass, client: InimPrimeClient):
+class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
+    """Coordinator to fetch data from the panel."""
+    STORAGE_VERSION = 1
+
+    panel_log_events_entity = None
+
+    def __init__(self, hass, client: InimPrimeClient, entry: ConfigEntry):
         super().__init__(
             hass,
             _LOGGER,
@@ -32,9 +42,18 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[PanelData]):
             update_interval=timedelta(seconds=10),
         )
         self.client = client
-        self.data: PanelData = PanelData()  # initialize with empty data
+        self.data: CoordinatorData = CoordinatorData()  # initialize with empty data
+        self.entry = entry
 
-    async def _async_update_data(self) -> PanelData:
+        self.last_panel_log_events_store = Store(
+            hass,
+            self.STORAGE_VERSION,
+            f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{STORAGE_KEY_LAST_PANEL_EVENT_LOGS}",
+        )
+
+        self.last_panel_log_events: list[LogEvent] = []
+
+    async def _async_update_data(self) -> CoordinatorData:
         """Fetch data from API."""
         try:
             zones = await self.client.get_zones_status()
@@ -49,7 +68,56 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[PanelData]):
             self.data.system_faults = system_faults
             self.data.gsm = gsm
 
+            current_panel_log_events, current_panel_log_events_filtered = await self.async_fetch_panel_log_events(
+                self.last_panel_log_events,
+                self.client
+            )
+
+            if current_panel_log_events_filtered and self.panel_log_events_entity:
+                for panel_log_event in current_panel_log_events_filtered:
+                    self.panel_log_events_entity.async_handle_event(panel_log_event)
+
+            self.last_panel_log_events = current_panel_log_events
+
             # Optionally fetch partitions, outputs, etc.
             return self.data
         except Exception as err:
             raise UpdateFailed(err) from err
+
+    async def async_load_last_panel_log_events(self):
+        """Load logs from HA storage."""
+        stored_data = await self.last_panel_log_events_store.async_load()
+        if stored_data and "logs" in stored_data:
+            last_panel_log_events = deserialize_panel_log_events(stored_data["logs"])
+        else:
+            last_panel_log_events = []
+        return last_panel_log_events
+
+    async def async_save_current_panel_log_events(
+            self,
+            current_panel_log_events: List[LogEvent]
+    ):
+        await self.last_panel_log_events_store.async_save(
+            {"logs": serialize_panel_log_events(current_panel_log_events)}
+        )
+
+    async def async_fetch_panel_log_events(
+            self,
+            last_panel_log_events: List[LogEvent],
+            client: InimPrimeClient,
+            limit: int = 10,
+    ) -> tuple[list[LogEvent], list[LogEvent]]:
+        """Fetch the latest panel log events and return only new ones."""
+        # Fetch raw logs from the panel
+        current_panel_log_events = await client.get_log_events(limit=limit)
+
+        # Compare with last saved logs
+        current_panel_log_events_filtered = filter_new_log_events(
+            last_log_events = last_panel_log_events,
+            current_log_events = current_panel_log_events,
+        )
+
+
+        await self.async_save_current_panel_log_events(current_panel_log_events)
+
+        return current_panel_log_events, current_panel_log_events_filtered

@@ -67,8 +67,6 @@ async def async_get_device_diagnostics(
 
     coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
 
-
-
     # Extract the device type and ID from the device identifiers
     device_info = {}
     for domain, dev_id in device.identifiers:

@@ -1,14 +1,13 @@
 from inim_prime.models.system_faults import EXPOSED_SYSTEM_FAULTS
 
-from .coordinator import InimPrimeDataUpdateCoordinator
 from .entities.panel import SystemFaultBinarySensor
 from .entities.partition import PartitionAlarmMemoryBinarySensor
 from .entities.zone import ZoneStateBinarySensor, ZoneAlarmMemoryBinarySensor
-
+from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:
     """Set up INIM Prime binary sensors from a config entry."""
-    coordinator: InimPrimeDataUpdateCoordinator = hass.data["inim_prime"][entry.entry_id]["coordinator"]
+    coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
 
     entities = []
 

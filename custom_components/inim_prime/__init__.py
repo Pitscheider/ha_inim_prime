@@ -20,7 +20,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await client.connect()
 
     # Crea coordinator
-    coordinator = InimPrimeDataUpdateCoordinator(hass, client)
+    coordinator = InimPrimeDataUpdateCoordinator(hass, client, entry)
     await coordinator.async_config_entry_first_refresh()
 
     # Salva nel dict di HA
@@ -31,7 +31,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Forward setup alle piattaforme
     # Nuovo metodo corretto per HA 2025+
-    await hass.config_entries.async_forward_entry_setups(entry, ["binary_sensor", "sensor", "switch", "select", "button"])
+    await hass.config_entries.async_forward_entry_setups(
+        entry = entry,
+        platforms = [
+            "binary_sensor",
+            "sensor",
+            "switch",
+            "select",
+            "button",
+            "event",
+        ]
+    )
 
     return True
 

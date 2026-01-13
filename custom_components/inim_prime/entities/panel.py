@@ -1,12 +1,15 @@
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
+from homeassistant.components.event import EventEntity
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
+from homeassistant.core import callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
+from inim_prime.models import LogEvent
 from inim_prime.models.system_faults import SystemFault
 
 def create_panel_device_info(
@@ -106,9 +109,9 @@ class PanelSupplyVoltageSensor(
     _attr_suggested_display_precision = 1
 
     def __init__(
-            self,
-            coordinator: InimPrimeDataUpdateCoordinator,
-            entry: ConfigEntry,
+        self,
+        coordinator: InimPrimeDataUpdateCoordinator,
+        entry: ConfigEntry,
     ):
         super().__init__(coordinator)
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_supply_voltage"
@@ -120,3 +123,35 @@ class PanelSupplyVoltageSensor(
         system_faults = self.coordinator.data.system_faults
         return system_faults.supply_voltage
 
+class PanelLogEvents(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    EventEntity,
+):
+    _attr_name = "Log Events"
+
+    def __init__(
+        self,
+        coordinator: InimPrimeDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ):
+        super().__init__(coordinator)
+
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_log_events"
+        self._attr_device_info = create_panel_device_info(entry)
+
+    def async_handle_event(self, log_event: LogEvent) -> None:
+        self._trigger_event(
+            event_type = "generic",
+            event_attributes = {
+                "timestamp": log_event.timestamp.isoformat(),
+                "type": log_event.type,
+                "agent": log_event.agent,
+                "location": log_event.location,
+            }
+        )
+        self.async_write_ha_state()
+
+
+    async def async_added_to_hass(self) -> None:
+        """Register ourselves with the coordinator."""
+        self.coordinator.panel_log_events_entity = self

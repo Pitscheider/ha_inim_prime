@@ -152,7 +152,7 @@ class PanelLogEvents(
                     "location": log_event.location,
                 }
             )
-            self.async_write_ha_state()
+            self.async_update_ha_state(force_refresh=True)
 
 
     async def async_added_to_hass(self) -> None:

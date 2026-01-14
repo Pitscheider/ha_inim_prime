@@ -8,7 +8,6 @@ from datetime import timedelta
 from custom_components.inim_prime import DOMAIN
 from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
     STORAGE_KEY_LAST_PANEL_EVENT_LOGS
-from custom_components.inim_prime.entities.panel import PanelLogEvents
 from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
     serialize_panel_log_events, async_fetch_panel_log_events
 
@@ -35,7 +34,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
     """Coordinator to fetch data from the panel."""
     STORAGE_VERSION = 1
 
-    panel_log_events_entity: PanelLogEvents = None
+    panel_log_events_entity = None
 
     def __init__(self, hass, client: InimPrimeClient, entry: ConfigEntry):
         super().__init__(

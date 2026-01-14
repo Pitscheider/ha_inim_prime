@@ -154,8 +154,9 @@ class PanelLogEvents(
                     "location": log_event.location,
                 }
             )
+            self.async_write_ha_state()
             await asyncio.sleep(0.01)
-        self.async_write_ha_state()
+
 
 
     async def async_added_to_hass(self) -> None:

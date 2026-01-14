@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Coroutine
+from typing import Dict, List, Any, Coroutine, Optional
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.storage import Store
@@ -80,7 +80,8 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 for panel_log_event in current_panel_log_events_filtered:
                     self.panel_log_events_entity.async_handle_event(panel_log_event)
 
-            self.last_panel_log_events = current_panel_log_events
+            if current_panel_log_events is not None:
+                self.last_panel_log_events = current_panel_log_events
 
             # Optionally fetch partitions, outputs, etc.
             return self.data
@@ -109,17 +110,21 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             last_panel_log_events: List[LogEvent],
             client: InimPrimeClient,
             limit: int = 10,
-    ) -> tuple[list[LogEvent], list[LogEvent]]:
-        """Fetch the latest panel log events and return only new ones."""
-        # Fetch raw logs from the panel
-        current_panel_log_events = await client.get_log_events(limit=limit)
+    ) -> tuple[Optional[List[LogEvent]], List[LogEvent]]:
+        try:
+            current_panel_log_events = await client.get_log_events(limit=limit)
+        except Exception as e:
+            _LOGGER.warning("Failed to fetch panel log events: %s", e)
+            # Return empty filtered list and preserve last logs
+            return None, []
 
-        # Compare with last saved logs
+            # Compare with last saved logs
         current_panel_log_events_filtered = filter_new_log_events(
             last_log_events=last_panel_log_events,
             current_log_events=current_panel_log_events,
         )
 
+        # Only save if fetch succeeded
         await self.async_save_current_panel_log_events(current_panel_log_events)
 
         return current_panel_log_events, current_panel_log_events_filtered

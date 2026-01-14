@@ -1,5 +1,7 @@
-from typing import List
+from typing import List, Optional
 
+from inim_prime import InimPrimeClient
+from inim_prime.helpers.log_events import filter_new_log_events
 from inim_prime.models import LogEvent
 from datetime import datetime
 
@@ -35,3 +37,23 @@ def serialize_panel_log_events(logs: List[LogEvent]) -> list[dict]:
 
 def deserialize_panel_log_events(data: list[dict]) -> List[LogEvent]:
     return [deserialize_panel_log_event(d) for d in data]
+
+
+async def async_fetch_panel_log_events(
+        last_panel_log_events: List[LogEvent],
+        client: InimPrimeClient,
+        limit: int = 10,
+) -> tuple[Optional[List[LogEvent]], List[LogEvent]]:
+    try:
+        current_panel_log_events = await client.get_log_events(limit=limit)
+    except Exception as e:
+        # Return empty filtered list and preserve last logs
+        return None, []
+
+        # Compare with last saved logs
+    current_panel_log_events_filtered = filter_new_log_events(
+        last_log_events=last_panel_log_events,
+        current_log_events=current_panel_log_events,
+    )
+
+    return current_panel_log_events, current_panel_log_events_filtered

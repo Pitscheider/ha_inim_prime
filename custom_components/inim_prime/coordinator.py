@@ -9,7 +9,7 @@ from custom_components.inim_prime import DOMAIN
 from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
     STORAGE_KEY_LAST_PANEL_EVENT_LOGS
 from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
-    serialize_panel_log_events
+    serialize_panel_log_events, async_fetch_panel_log_events
 
 from inim_prime import InimPrimeClient
 from inim_prime.helpers.log_events import filter_new_log_events
@@ -71,7 +71,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self.data.system_faults = system_faults
             self.data.gsm = gsm
 
-            current_panel_log_events, current_panel_log_events_filtered = await self.async_fetch_panel_log_events(
+            current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
                 self.last_panel_log_events or [],
                 self.client
             )
@@ -82,6 +82,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
             if current_panel_log_events is not None:
                 self.last_panel_log_events = current_panel_log_events
+                await self.async_save_current_panel_log_events(self.last_panel_log_events)
 
             # Optionally fetch partitions, outputs, etc.
             return self.data
@@ -104,27 +105,3 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
         await self.last_panel_log_events_store.async_save(
             {"logs": serialize_panel_log_events(current_panel_log_events)}
         )
-
-    async def async_fetch_panel_log_events(
-            self,
-            last_panel_log_events: List[LogEvent],
-            client: InimPrimeClient,
-            limit: int = 10,
-    ) -> tuple[Optional[List[LogEvent]], List[LogEvent]]:
-        try:
-            current_panel_log_events = await client.get_log_events(limit=limit)
-        except Exception as e:
-            _LOGGER.warning("Failed to fetch panel log events: %s", e)
-            # Return empty filtered list and preserve last logs
-            return None, []
-
-            # Compare with last saved logs
-        current_panel_log_events_filtered = filter_new_log_events(
-            last_log_events=last_panel_log_events,
-            current_log_events=current_panel_log_events,
-        )
-
-        # Only save if fetch succeeded
-        await self.async_save_current_panel_log_events(current_panel_log_events)
-
-        return current_panel_log_events, current_panel_log_events_filtered

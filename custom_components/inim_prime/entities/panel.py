@@ -141,17 +141,18 @@ class PanelLogEvents(
         self._attr_device_info = create_panel_device_info(entry)
 
     @callback
-    def async_handle_event(self, log_event: LogEvent) -> None:
-        self._trigger_event(
-            event_type = "generic",
-            event_attributes = {
-                "timestamp": log_event.timestamp.isoformat(),
-                "type": log_event.type,
-                "agent": log_event.agent,
-                "location": log_event.location,
-            }
-        )
-        self.async_write_ha_state()
+    def handle_event(self, log_events: list[LogEvent]) -> None:
+        for log_event in log_events:
+            self._trigger_event(
+                event_type = "generic",
+                event_attributes = {
+                    "timestamp": log_event.timestamp.isoformat(),
+                    "type": log_event.type,
+                    "agent": log_event.agent,
+                    "location": log_event.location,
+                }
+            )
+            self.async_write_ha_state()
 
 
     async def async_added_to_hass(self) -> None:

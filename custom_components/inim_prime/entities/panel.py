@@ -1,3 +1,5 @@
+import asyncio
+
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
 from homeassistant.components.event import EventEntity
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
@@ -140,8 +142,8 @@ class PanelLogEvents(
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_log_events"
         self._attr_device_info = create_panel_device_info(entry)
 
-    @callback
-    def handle_events(self, log_events: list[LogEvent]) -> None:
+
+    async def handle_events(self, log_events: list[LogEvent]) -> None:
         for log_event in log_events:
             self._trigger_event(
                 event_type = "generic",
@@ -152,6 +154,7 @@ class PanelLogEvents(
                     "location": log_event.location,
                 }
             )
+            await asyncio.sleep(0.01)
         self.async_write_ha_state()
 
 

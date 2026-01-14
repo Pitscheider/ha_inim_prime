@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Dict, List, Any, Coroutine, Optional
+from typing import Dict, List
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.storage import Store
@@ -13,7 +13,6 @@ from custom_components.inim_prime.helpers.panel_log_events import deserialize_pa
     serialize_panel_log_events, async_fetch_panel_log_events
 
 from inim_prime import InimPrimeClient
-from inim_prime.helpers.log_events import filter_new_log_events
 from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus, LogEvent
 from inim_prime.models.partition import PartitionStatus
 from inim_prime.models.zone import ZoneStatus

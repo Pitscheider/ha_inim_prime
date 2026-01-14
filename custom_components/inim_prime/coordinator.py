@@ -1,3 +1,4 @@
+import asyncio
 from dataclasses import dataclass, field
 from typing import Dict, List, Any, Coroutine, Optional
 
@@ -79,6 +80,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             if current_panel_log_events_filtered and self.panel_log_events_entity:
                 for panel_log_event in current_panel_log_events_filtered:
                     self.panel_log_events_entity.async_handle_event(panel_log_event)
+                    await asyncio.sleep(0.01)  # tiny delay between events
 
             if current_panel_log_events is not None:
                 self.last_panel_log_events = current_panel_log_events

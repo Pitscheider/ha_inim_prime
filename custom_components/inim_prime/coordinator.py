@@ -78,7 +78,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             )
 
             if current_panel_log_events_filtered and self.panel_log_events_entity:
-                self.panel_log_events_entity.handle_event(current_panel_log_events_filtered)
+                self.panel_log_events_entity.handle_events(current_panel_log_events_filtered)
 
             if current_panel_log_events is not None:
                 self.last_panel_log_events = current_panel_log_events

@@ -154,6 +154,7 @@ class PanelLogEvents(
                     "location": log_event.location,
                 }
             )
+            # Multiple events fired at the same time are only visible if self.async_write_ha_state() is triggered each time after waiting some time.
             self.async_write_ha_state()
             await asyncio.sleep(0.01)
 

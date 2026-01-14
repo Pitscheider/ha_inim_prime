@@ -140,6 +140,7 @@ class PanelLogEvents(
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_log_events"
         self._attr_device_info = create_panel_device_info(entry)
 
+    @callback
     def async_handle_event(self, log_event: LogEvent) -> None:
         self._trigger_event(
             event_type = "generic",

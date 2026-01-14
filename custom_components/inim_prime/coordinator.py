@@ -8,7 +8,8 @@ from datetime import timedelta
 from custom_components.inim_prime import DOMAIN
 from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
     STORAGE_KEY_LAST_PANEL_EVENT_LOGS
-from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, serialize_panel_log_events
+from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
+    serialize_panel_log_events
 
 from inim_prime import InimPrimeClient
 from inim_prime.helpers.log_events import filter_new_log_events
@@ -19,10 +20,12 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+
 @dataclass
 class CoordinatorData:
     system_faults: SystemFaultsStatus = SystemFaultsStatus(supply_voltage=None, faults=frozenset())
-    gsm: GSMSStatus = GSMSStatus(supply_voltage=None, firmware_version=None, operator=None, signal_strength=None, credit=None)
+    gsm: GSMSStatus = GSMSStatus(supply_voltage=None, firmware_version=None, operator=None, signal_strength=None,
+                                 credit=None)
     zones: Dict[int, ZoneStatus] = field(default_factory=dict)
     partitions: Dict[int, PartitionStatus] = field(default_factory=dict)
     outputs: Dict[int, OutputStatus] = field(default_factory=dict)
@@ -69,7 +72,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self.data.gsm = gsm
 
             current_panel_log_events, current_panel_log_events_filtered = await self.async_fetch_panel_log_events(
-                self.last_panel_log_events,
+                self.last_panel_log_events or [],
                 self.client
             )
 
@@ -113,10 +116,9 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
 
         # Compare with last saved logs
         current_panel_log_events_filtered = filter_new_log_events(
-            last_log_events = last_panel_log_events,
-            current_log_events = current_panel_log_events,
+            last_log_events=last_panel_log_events,
+            current_log_events=current_panel_log_events,
         )
-
 
         await self.async_save_current_panel_log_events(current_panel_log_events)
 

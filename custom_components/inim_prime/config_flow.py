@@ -10,7 +10,8 @@ from custom_components.inim_prime.const import (
     CONF_API_KEY,
     CONF_USE_HTTPS,
     CONF_SERIAL_NUMBER,
-    DOMAIN,
+    DOMAIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
 )
 from inim_prime import InimPrimeClient
 
@@ -29,6 +30,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             conf_api_key: str = user_input[CONF_API_KEY].strip()
             conf_use_https: bool = user_input.get(CONF_USE_HTTPS, True)
             conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
+            conf_panel_log_events_fetch_limit: int = user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT]
 
             # Ensure unique ID is set to prevent duplicate entries
             await self.async_set_unique_id(conf_serial_number)
@@ -54,6 +56,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_API_KEY: conf_api_key,
                         CONF_USE_HTTPS: conf_use_https,
                         CONF_SERIAL_NUMBER: conf_serial_number,
+                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: conf_panel_log_events_fetch_limit,
                     },
                 )
 
@@ -64,6 +67,11 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Required(CONF_API_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
                 vol.Optional(CONF_USE_HTTPS, default=True): bool,
                 vol.Required(CONF_SERIAL_NUMBER): str,
+                vol.Required(CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, default = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT):
+                    vol.All(int, vol.Range(
+                        min = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
+                        max = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+                    ))
             }
         )
         return self.async_show_form(

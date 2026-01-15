@@ -35,6 +35,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
     STORAGE_VERSION = 1
 
     panel_log_events_entity = None
+    last_panel_log_events: list[LogEvent] = []
 
     def __init__(self, hass, client: InimPrimeClient, entry: ConfigEntry):
         super().__init__(
@@ -52,8 +53,6 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self.STORAGE_VERSION,
             f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{STORAGE_KEY_LAST_PANEL_EVENT_LOGS}",
         )
-
-        self.last_panel_log_events: list[LogEvent] = []
 
     async def _async_update_data(self) -> CoordinatorData:
         """Fetch data from API."""
@@ -80,8 +79,9 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 #    1. `current_panel_log_events` → all events fetched from the panel
                 #    2. `current_panel_log_events_filtered` → only new events since last fetch
                 current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                    self.last_panel_log_events,
-                    self.client
+                    last_panel_log_events = self.last_panel_log_events,
+                    client = self.client,
+                    limit = 10,
                 )
 
                 # If there are any new events after filtering

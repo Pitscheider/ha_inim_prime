@@ -18,8 +18,8 @@ from inim_prime import InimPrimeClient
 
 class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for INIM Prime integration."""
-    VERSION = 1  # Major version
-    MINOR_VERSION = 0  # Minor version for migration tracking
+    VERSION = 1
+    MINOR_VERSION = 0
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
         """Handle the initial step initiated by the user."""
@@ -32,11 +32,9 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
             conf_panel_log_events_fetch_limit: int = user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT]
 
-            # Ensure unique ID is set to prevent duplicate entries
             await self.async_set_unique_id(conf_serial_number)
             self._abort_if_unique_id_configured()
 
-            # Attempt to connect to the device to verify credentials
             try:
                 client = InimPrimeClient(
                     host=conf_host,
@@ -48,7 +46,6 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             except Exception:
                 errors["base"] = "cannot_connect"
             else:
-                # Create the config entry
                 return self.async_create_entry(
                     title=f"INIM Prime ({conf_serial_number})",
                     data={
@@ -60,29 +57,31 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     },
                 )
 
-        # Show the form if no input or if there were errors
         schema = vol.Schema(
             {
                 vol.Required(CONF_HOST): str,
-                vol.Required(CONF_API_KEY): TextSelector(TextSelectorConfig(type=TextSelectorType.PASSWORD)),
+                vol.Required(CONF_API_KEY): TextSelector(
+                    TextSelectorConfig(type=TextSelectorType.PASSWORD)
+                ),
                 vol.Optional(CONF_USE_HTTPS, default=True): bool,
                 vol.Required(CONF_SERIAL_NUMBER): str,
-                vol.Required(CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, default = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT):
-                    vol.All(int, vol.Range(
-                        min = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
-                        max = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
-                    ))
+                vol.Required(
+                    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+                    default=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
+                ): vol.All(
+                    int,
+                    vol.Range(
+                        min=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
+                        max=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+                    ),
+                ),
             }
         )
-        return self.async_show_form(
-            step_id="user",
-            data_schema=schema,
-            errors=errors,
-        )
+        return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
-    @classmethod
+    @staticmethod
     @callback
-    def async_get_options_flow(cls, config_entry) -> config_entries.OptionsFlow:
+    def async_get_options_flow(config_entry) -> config_entries.OptionsFlow:
         """Return the options flow handler for this integration."""
         return InimPrimeOptionsFlowHandler(config_entry)
 
@@ -91,11 +90,10 @@ class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for the INIM Prime integration."""
 
     def __init__(self, config_entry: config_entries.ConfigEntry):
-        self.config_entry = config_entry
+        """No need to store config_entry, base class already does it."""
+        super().__init__(config_entry)
 
-    async def async_step_init(
-        self, user_input: dict[str, Any] | None = None
-    ):
+    async def async_step_init(self, user_input: dict[str, Any] | None = None):
         """Manage options."""
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)

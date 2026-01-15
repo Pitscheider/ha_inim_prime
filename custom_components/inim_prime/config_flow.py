@@ -79,23 +79,22 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         )
         return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
 
-    @staticmethod
+    @classmethod
     @callback
-    def async_get_options_flow(config_entry) -> config_entries.OptionsFlow:
+    def async_get_options_flow(cls, config_entry):
         """Return the options flow handler for this integration."""
         return InimPrimeOptionsFlowHandler(config_entry)
-
 
 class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for the INIM Prime integration."""
 
-    def __init__(self, config_entry: config_entries.ConfigEntry):
-        """No need to store config_entry, base class already does it."""
-        super().__init__(config_entry)
+    def __init__(self, config_entry):
+        """Store config_entry (automatically passed by Home Assistant)."""
+        self.config_entry = config_entry
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         """Manage options."""
-        if user_input is not None:
+        if user_input:
             return self.async_create_entry(title="", data=user_input)
 
         schema = vol.Schema(
@@ -104,6 +103,14 @@ class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
                     CONF_USE_HTTPS,
                     default=self.config_entry.data.get(CONF_USE_HTTPS, True),
                 ): bool,
+                vol.Optional(
+                    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+                    default=self.config_entry.data.get(CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT),
+                ): vol.All(int, vol.Range(
+                    min=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
+                    max=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+                )),
             }
         )
+
         return self.async_show_form(step_id="init", data_schema=schema)

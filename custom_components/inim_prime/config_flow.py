@@ -88,10 +88,6 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for the INIM Prime integration."""
 
-    def __init__(self, config_entry):
-        """Store config_entry (automatically passed by Home Assistant)."""
-        self.config_entry = config_entry
-
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         """Manage options."""
         if user_input:
@@ -105,7 +101,10 @@ class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
                 ): bool,
                 vol.Optional(
                     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-                    default=self.config_entry.data.get(CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT),
+                    default=self.config_entry.data.get(
+                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
+                    ),
                 ): vol.All(int, vol.Range(
                     min=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
                     max=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,

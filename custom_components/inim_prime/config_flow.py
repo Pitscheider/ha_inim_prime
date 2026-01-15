@@ -83,7 +83,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     @callback
     def async_get_options_flow(cls, config_entry):
         """Return the options flow handler for this integration."""
-        return InimPrimeOptionsFlowHandler(config_entry)
+        return InimPrimeOptionsFlowHandler()
 
 class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options for the INIM Prime integration."""

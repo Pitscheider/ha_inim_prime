@@ -1,5 +1,5 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.panel import PanelLogEvents
+from custom_components.inim_prime.entities.panel import PanelLogEventsEvent
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:
@@ -9,6 +9,6 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
 
     entities = []
 
-    entities.append(PanelLogEvents(coordinator, entry))
+    entities.append(PanelLogEventsEvent(coordinator, entry))
 
     async_add_entities(entities, update_before_add=True)

@@ -125,7 +125,7 @@ class PanelSupplyVoltageSensor(
         system_faults = self.coordinator.data.system_faults
         return system_faults.supply_voltage
 
-class PanelLogEvents(
+class PanelLogEventsEvent(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     EventEntity,
 ):

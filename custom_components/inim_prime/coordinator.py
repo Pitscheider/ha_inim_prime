@@ -81,7 +81,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
                     last_panel_log_events = self.last_panel_log_events,
                     client = self.client,
-                    limit = 10,
+                    limit = self.entry.data[CONF_SERIAL_NUMBER],
                 )
 
                 # If there are any new events after filtering

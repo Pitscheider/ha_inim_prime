@@ -52,7 +52,9 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         CONF_HOST: conf_host,
                         CONF_API_KEY: conf_api_key,
                         CONF_USE_HTTPS: conf_use_https,
-                        CONF_SERIAL_NUMBER: conf_serial_number,
+                    },
+                    options={
+                        CONF_USE_HTTPS: conf_use_https,
                         CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: conf_panel_log_events_fetch_limit,
                     },
                 )
@@ -77,7 +79,11 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 ),
             }
         )
-        return self.async_show_form(step_id="user", data_schema=schema, errors=errors)
+        return self.async_show_form(
+            step_id="user",
+            data_schema=schema,
+            errors=errors,
+        )
 
     @classmethod
     @callback
@@ -101,7 +107,7 @@ class InimPrimeOptionsFlowHandler(config_entries.OptionsFlow):
                 ): bool,
                 vol.Optional(
                     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-                    default=self.config_entry.data.get(
+                    default=self.config_entry.options.get(
                         CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
                         CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
                     ),

@@ -7,7 +7,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from datetime import timedelta
 from custom_components.inim_prime import DOMAIN
 from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
-    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT
+    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
 from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
     serialize_panel_log_events, async_fetch_panel_log_events
 
@@ -54,6 +54,14 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{STORAGE_KEY_LAST_PANEL_EVENT_LOGS}",
         )
 
+    @property
+    def panel_log_events_fetch_limit(self) -> int:
+        """Return the current panel log events fetch limit from options."""
+        return self.config_entry.options.get(
+            CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+            CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
+        )
+
     async def _async_update_data(self) -> CoordinatorData:
         """Fetch data from API."""
         try:
@@ -81,7 +89,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
                     last_panel_log_events = self.last_panel_log_events,
                     client = self.client,
-                    limit = self.entry.data[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT],
+                    limit = self.panel_log_events_fetch_limit,
                 )
 
                 # If there are any new events after filtering

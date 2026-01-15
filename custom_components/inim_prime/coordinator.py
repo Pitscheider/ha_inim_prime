@@ -70,20 +70,36 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self.data.system_faults = system_faults
             self.data.gsm = gsm
 
+            # Do not consume panel log events until panel_log_events_entity is ready,
+            # otherwise events could be lost before HA can fire them.
             if self.panel_log_events_entity:
+
+                # Fetch the latest log events from the panel.
+                # - `self.last_panel_log_events` is used to filter out events we already know.
+                # - Returns two lists:
+                #    1. `current_panel_log_events` → all events fetched from the panel
+                #    2. `current_panel_log_events_filtered` → only new events since last fetch
                 current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                    self.last_panel_log_events or [],
+                    self.last_panel_log_events,
                     self.client
                 )
 
+                # If there are any new events after filtering
                 if current_panel_log_events_filtered:
-                    await self.panel_log_events_entity.handle_events(current_panel_log_events_filtered)
 
-                if current_panel_log_events is not None:
+                    # Pass the new events to the panel_log_events_entity to trigger HA events.
+                    # This will fire each event in PanelLogEventsEvent.
+                    await self.panel_log_events_entity.handle_events(
+                        current_panel_log_events_filtered,
+                    )
+
+                    # Update the stored full list of panel events and persist it.
+                    # Since there are new events, we are sure `current_panel_log_events` contains valid data.
                     self.last_panel_log_events = current_panel_log_events
-                    await self.async_save_current_panel_log_events(self.last_panel_log_events)
+                    await self.async_save_current_panel_log_events(
+                        self.last_panel_log_events,
+                    )
 
-            # Optionally fetch partitions, outputs, etc.
             return self.data
         except Exception as err:
             raise UpdateFailed(err) from err
@@ -101,9 +117,10 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self,
             current_panel_log_events: List[LogEvent]
     ):
-        await self.last_panel_log_events_store.async_save(
-            {"logs": serialize_panel_log_events(current_panel_log_events)}
-        )
+        if current_panel_log_events:
+            await self.last_panel_log_events_store.async_save(
+                {"logs": serialize_panel_log_events(current_panel_log_events)}
+            )
 
     async def async_startup(self) -> None:
         """Load persisted data before first refresh."""

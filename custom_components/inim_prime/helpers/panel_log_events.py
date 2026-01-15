@@ -43,12 +43,12 @@ async def async_fetch_panel_log_events(
         last_panel_log_events: List[LogEvent],
         client: InimPrimeClient,
         limit: int = 10,
-) -> tuple[Optional[List[LogEvent]], List[LogEvent]]:
+) -> tuple[Optional[List[LogEvent]], Optional[List[LogEvent]]]:
     try:
         current_panel_log_events = await client.get_log_events(limit=limit)
     except Exception as e:
         # Return empty filtered list and preserve last logs
-        return None, []
+        return None, None
 
         # Compare with last saved logs
     current_panel_log_events_filtered = filter_new_log_events(

@@ -70,17 +70,18 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self.data.system_faults = system_faults
             self.data.gsm = gsm
 
-            current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                self.last_panel_log_events or [],
-                self.client
-            )
+            if self.panel_log_events_entity:
+                current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
+                    self.last_panel_log_events or [],
+                    self.client
+                )
 
-            if current_panel_log_events_filtered and self.panel_log_events_entity:
-                await self.panel_log_events_entity.handle_events(current_panel_log_events_filtered)
+                if current_panel_log_events_filtered:
+                    await self.panel_log_events_entity.handle_events(current_panel_log_events_filtered)
 
-            if current_panel_log_events is not None:
-                self.last_panel_log_events = current_panel_log_events
-                await self.async_save_current_panel_log_events(self.last_panel_log_events)
+                if current_panel_log_events is not None:
+                    self.last_panel_log_events = current_panel_log_events
+                    await self.async_save_current_panel_log_events(self.last_panel_log_events)
 
             # Optionally fetch partitions, outputs, etc.
             return self.data

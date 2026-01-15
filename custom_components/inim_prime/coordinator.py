@@ -7,7 +7,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from datetime import timedelta
 from custom_components.inim_prime import DOMAIN
 from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
-    STORAGE_KEY_LAST_PANEL_EVENT_LOGS
+    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT
 from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
     serialize_panel_log_events, async_fetch_panel_log_events
 
@@ -81,7 +81,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
                 current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
                     last_panel_log_events = self.last_panel_log_events,
                     client = self.client,
-                    limit = self.entry.data[CONF_SERIAL_NUMBER],
+                    limit = self.entry.data[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT],
                 )
 
                 # If there are any new events after filtering

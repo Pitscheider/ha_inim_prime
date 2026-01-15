@@ -103,3 +103,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
         await self.last_panel_log_events_store.async_save(
             {"logs": serialize_panel_log_events(current_panel_log_events)}
         )
+
+    async def async_startup(self) -> None:
+        """Load persisted data before first refresh."""
+        self.last_panel_log_events = await self.async_load_last_panel_log_events()

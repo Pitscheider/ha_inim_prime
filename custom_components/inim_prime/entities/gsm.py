@@ -14,12 +14,12 @@ def create_gsm_device_info(
     sw_version: str = None
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_gsm")},
-        name="GSM",
-        model="Prime GSM",
-        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
-        via_device=(domain, entry.data[CONF_SERIAL_NUMBER]),
-        sw_version=sw_version,
+        identifiers = {(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_gsm")},
+        name = "GSM",
+        model = "Prime GSM",
+        manufacturer = INIM_PRIME_DEVICE_MANUFACTURER,
+        via_device = (domain, entry.data[CONF_SERIAL_NUMBER]),
+        sw_version = sw_version,
     )
 
 class GSMSupplyVoltageSensor(

@@ -21,6 +21,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Crea coordinator
     coordinator = InimPrimeDataUpdateCoordinator(hass, client, entry)
+    await coordinator.async_startup()
     await coordinator.async_config_entry_first_refresh()
 
     # Salva nel dict di HA

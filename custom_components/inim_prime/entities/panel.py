@@ -163,3 +163,24 @@ class PanelLogEventsEvent(
     async def async_added_to_hass(self) -> None:
         """Register ourselves with the coordinator."""
         self.coordinator.panel_log_events_entity = self
+
+class PanelExcludedZonesCountSensor(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    SensorEntity,
+):
+    _attr_name = "Excluded Zones"
+
+    def __init__(
+        self,
+        coordinator: InimPrimeDataUpdateCoordinator,
+        entry: ConfigEntry,
+    ):
+        super().__init__(coordinator)
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_excluded_zones_count"
+        self._attr_device_info = create_panel_device_info(entry)
+
+    @property
+    def native_value(self) -> int | None:
+        if self.coordinator.data.zones:
+            return sum(zone.excluded for zone in self.coordinator.data.zones.values())
+        return None

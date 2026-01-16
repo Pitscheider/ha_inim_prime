@@ -1,6 +1,7 @@
 import asyncio
 
 from homeassistant.components.binary_sensor import BinarySensorEntity, BinarySensorDeviceClass
+from homeassistant.components.button import ButtonEntity
 from homeassistant.components.event import EventEntity
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
@@ -11,6 +12,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
+from inim_prime.helpers.zones import include_all_zones
 from inim_prime.models import LogEvent
 from inim_prime.models.system_faults import SystemFault
 
@@ -184,3 +186,33 @@ class PanelExcludedZonesCountSensor(
         if self.coordinator.data.zones:
             return sum(zone.excluded for zone in self.coordinator.data.zones.values())
         return None
+
+class PanelIncludeAllZonesButton(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    ButtonEntity,
+):
+    _attr_name = "Include All Zones"
+    _attr_icon = "mdi:check-all"
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+    ):
+        super().__init__(coordinator)
+
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_include_all_zones"
+
+        self._attr_device_info = create_panel_device_info(
+            entry = entry,
+        )
+
+    async def async_press(self) -> None:
+        await include_all_zones(
+            zones = self.coordinator.data.zones,
+            client = self.coordinator.client,
+        )
+
+        await self.coordinator.async_request_refresh()
+

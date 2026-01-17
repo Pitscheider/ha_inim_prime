@@ -85,6 +85,45 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             errors=errors,
         )
 
+    async def async_step_reauth(self, user_input=None):
+        errors = {}
+        config_entry = self.hass.config_entries.async_get_entry(
+            self.context["entry_id"]
+        )
+
+        if user_input is not None:
+            try:
+                client = InimPrimeClient(
+                    host=user_input[CONF_HOST],
+                    api_key=user_input[CONF_API_KEY],
+                    use_https=user_input.get(CONF_USE_HTTPS, True),
+                )
+                await client.connect()
+                await client.close()
+            except Exception:
+                errors["base"] = "cannot_connect"
+            else:
+                self.hass.config_entries.async_update_entry(
+                    config_entry,
+                    data={
+                        **config_entry.data,
+                        CONF_HOST: user_input[CONF_HOST],
+                        CONF_API_KEY: user_input[CONF_API_KEY],
+                    },
+                )
+                await self.hass.config_entries.async_reload(config_entry.entry_id)
+                return self.async_abort(reason="reauth_successful")
+
+        return self.async_show_form(
+            step_id="reauth",
+            data_schema=vol.Schema({
+                vol.Required(CONF_HOST): str,
+                vol.Required(CONF_API_KEY): str,
+                vol.Optional(CONF_USE_HTTPS, default=True): bool,
+            }),
+            errors=errors,
+        )
+
     @classmethod
     @callback
     def async_get_options_flow(cls, config_entry):

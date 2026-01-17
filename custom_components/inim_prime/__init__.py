@@ -59,6 +59,12 @@ async def async_remove_config_entry_device(
 
     return True
 
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload INIM Prime config entry."""
+    await async_unload_entry(hass, entry)
+    await async_setup_entry(hass, entry)
+
+
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload INIM Prime integration."""
     data = hass.data[DOMAIN].pop(entry.entry_id)

@@ -1,5 +1,3 @@
-from homeassistant.components.onewire.onewirehub import DEVICE_MANUFACTURER
-
 DOMAIN = "inim_prime"
 
 CONF_HOST = "host"

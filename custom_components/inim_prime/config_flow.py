@@ -51,7 +51,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     data={
                         CONF_HOST: conf_host,
                         CONF_API_KEY: conf_api_key,
-                        CONF_USE_HTTPS: conf_use_https,
+                        CONF_SERIAL_NUMBER: conf_serial_number
                     },
                     options={
                         CONF_USE_HTTPS: conf_use_https,

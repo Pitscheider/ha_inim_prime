@@ -12,6 +12,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
+from inim_prime.helpers.partitions import clear_all_partitions_alarm_memory
 from inim_prime.helpers.zones import include_all_zones
 from inim_prime.models import LogEvent
 from inim_prime.models.system_faults import SystemFault
@@ -166,7 +167,7 @@ class PanelLogEventsEvent(
         """Register ourselves with the coordinator."""
         self.coordinator.panel_log_events_entity = self
 
-class PanelExcludedZonesCountSensor(
+class ExcludedZonesCountSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     SensorEntity,
 ):
@@ -187,7 +188,7 @@ class PanelExcludedZonesCountSensor(
             return sum(zone.excluded for zone in self.coordinator.data.zones.values())
         return None
 
-class PanelIncludeAllZonesButton(
+class IncludeAllZonesButton(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     ButtonEntity,
 ):
@@ -202,7 +203,7 @@ class PanelIncludeAllZonesButton(
     ):
         super().__init__(coordinator)
 
-        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_panel_include_all_zones"
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_include_all_zones"
 
         self._attr_device_info = create_panel_device_info(
             entry = entry,
@@ -216,3 +217,31 @@ class PanelIncludeAllZonesButton(
 
         await self.coordinator.async_request_refresh()
 
+class ClearAllPartitionsAlarmMemoryButton(
+    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    ButtonEntity,
+):
+    _attr_name = "Clear All Alarm Memories"
+    _attr_icon = "mdi:alarm-light-off"
+    _attr_entity_category = EntityCategory.CONFIG
+
+    def __init__(
+            self,
+            coordinator: InimPrimeDataUpdateCoordinator,
+            entry: ConfigEntry,
+    ):
+        super().__init__(coordinator)
+
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_clear_all_partitions_alarm_memory"
+
+        self._attr_device_info = create_panel_device_info(
+            entry = entry,
+        )
+
+    async def async_press(self) -> None:
+        await clear_all_partitions_alarm_memory(
+            partitions = self.coordinator.data.partitions,
+            client = self.coordinator.client,
+        )
+
+        await self.coordinator.async_request_refresh()

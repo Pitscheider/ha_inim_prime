@@ -183,11 +183,13 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     data_updates = data_updates,
                 )
         data_schema = vol.Schema(
-            **build_connection_schema(
-                default_host=entry.data[CONF_HOST],
-                default_use_https=entry.options.get(CONF_USE_HTTPS, True),
-                require_api_key=False,  # allow leaving it empty
-            )
+            {
+                **build_connection_schema(
+                    default_host=entry.data[CONF_HOST],
+                    default_use_https=entry.options.get(CONF_USE_HTTPS, True),
+                    require_api_key=False,  # allow leaving it empty
+                )
+            }
         )
         return self.async_show_form(
             step_id = "reconfigure",

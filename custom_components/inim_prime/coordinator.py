@@ -7,7 +7,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from datetime import timedelta
 from custom_components.inim_prime import DOMAIN
 from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
-    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
+    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT, \
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX
 from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
     serialize_panel_log_events, async_fetch_panel_log_events
 
@@ -81,32 +82,61 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             # otherwise events could be lost before HA can fire them.
             if self.panel_log_events_entity:
 
-                # Fetch the latest log events from the panel.
-                # - `self.last_panel_log_events` is used to filter out events we already know.
-                # - Returns two lists:
-                #    1. `current_panel_log_events` → all events fetched from the panel
-                #    2. `current_panel_log_events_filtered` → only new events since last fetch
-                current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
+                # Phase 1: lightweight "trigger" fetch.
+                # Fetch only a small number of the most recent log events to quickly check
+                # whether any new events appeared since the last poll.
+                #
+                # - `self.last_panel_log_events` is used to filter out already known events
+                # - The fetched list is not stored; we only check if there are any new events
+                # - If no new events are detected here, the heavier full fetch is skipped
+                _, trigger_new_events = await async_fetch_panel_log_events(
                     last_panel_log_events = self.last_panel_log_events,
                     client = self.client,
-                    limit = self.panel_log_events_fetch_limit,
+                    limit = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER,
                 )
 
-                # If there are any new events after filtering
-                if current_panel_log_events_filtered:
+                # If at least one new event is detected, perform a full fetch to ensure
+                # we do not miss any events that occurred between polling intervals.
+                if trigger_new_events:
 
-                    # Pass the new events to the panel_log_events_entity to trigger HA events.
-                    # This will fire each event in PanelLogEventsEvent.
-                    await self.panel_log_events_entity.handle_events(
-                        current_panel_log_events_filtered,
+                    # Phase 2: authoritative fetch.
+                    # Fetch a larger window of recent log events and re-filter them against
+                    # the last known state to obtain the complete and correctly ordered list of new events.
+                    current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
+                        last_panel_log_events = self.last_panel_log_events,
+                        client = self.client,
+                        limit = self.panel_log_events_fetch_limit,
                     )
 
-                    # Update the stored full list of panel events and persist it.
-                    # Since there are new events, we are sure `current_panel_log_events` contains valid data.
-                    self.last_panel_log_events = current_panel_log_events
-                    await self.async_save_current_panel_log_events(
-                        self.last_panel_log_events,
-                    )
+                    # Defensive max-limit fetch:
+                    # If the fetched window is fully saturated with new events, it may mean
+                    # more events occurred than the configured fetch limit. Perform a single
+                    # refetch using the maximum allowed window to reduce the risk of missing events.
+                    if (
+                        self.panel_log_events_fetch_limit < CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX and
+                        self.panel_log_events_fetch_limit == len(current_panel_log_events_filtered)
+                    ):
+                        current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
+                            last_panel_log_events = self.last_panel_log_events,
+                            client = self.client,
+                            limit = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+                        )
+
+                    # If there are any new events after filtering
+                    if current_panel_log_events_filtered:
+
+                        # Pass the new events to the panel_log_events_entity to trigger HA events.
+                        # This will fire each event in PanelLogEventsEvent.
+                        await self.panel_log_events_entity.handle_events(
+                            current_panel_log_events_filtered,
+                        )
+
+                        # Update the stored full list of panel events and persist it.
+                        # Since there are new events, we are sure `current_panel_log_events` contains valid data.
+                        self.last_panel_log_events = current_panel_log_events
+                        await self.async_save_current_panel_log_events(
+                            self.last_panel_log_events,
+                        )
 
             return self.data
         except Exception as err:

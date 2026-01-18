@@ -12,6 +12,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
+from custom_components.inim_prime.coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 from inim_prime.helpers.partitions import clear_all_partitions_alarm_memory
 from inim_prime.helpers.zones import include_all_zones
 from inim_prime.models import LogEvent
@@ -137,7 +138,7 @@ class PanelLogEventsEvent(
 
     def __init__(
         self,
-        coordinator: InimPrimeDataUpdateCoordinator,
+        coordinator: InimPrimePanelLogEventsCoordinator,
         entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -161,11 +162,6 @@ class PanelLogEventsEvent(
             self.async_write_ha_state()
             await asyncio.sleep(0.01)
 
-
-
-    async def async_added_to_hass(self) -> None:
-        """Register ourselves with the coordinator."""
-        self.coordinator.panel_log_events_entity = self
 
 class ExcludedZonesCountSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],

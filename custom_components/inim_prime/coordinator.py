@@ -1,22 +1,15 @@
+import logging
 from dataclasses import dataclass, field
-from typing import Dict, List
+from datetime import timedelta
+from typing import Dict
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from datetime import timedelta
-from custom_components.inim_prime import DOMAIN
-from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
-    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT, \
-    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX
-from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
-    serialize_panel_log_events, async_fetch_panel_log_events
 
 from inim_prime import InimPrimeClient
-from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus, LogEvent
+from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus
 from inim_prime.models.partition import PartitionStatus
 from inim_prime.models.zone import ZoneStatus
-import logging
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -35,9 +28,6 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
     """Coordinator to fetch data from the panel."""
     STORAGE_VERSION = 1
 
-    panel_log_events_entity = None
-    last_panel_log_events: list[LogEvent] = []
-
     def __init__(self, hass, client: InimPrimeClient, entry: ConfigEntry):
         super().__init__(
             hass,
@@ -49,19 +39,6 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
         self.data: CoordinatorData = CoordinatorData()  # initialize with empty data
         self.entry = entry
 
-        self.last_panel_log_events_store = Store(
-            hass,
-            self.STORAGE_VERSION,
-            f"{DOMAIN}_{entry.data[CONF_SERIAL_NUMBER]}_{STORAGE_KEY_LAST_PANEL_EVENT_LOGS}",
-        )
-
-    @property
-    def panel_log_events_fetch_limit(self) -> int:
-        """Return the current panel log events fetch limit from options."""
-        return self.config_entry.options.get(
-            CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-            CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
-        )
 
     async def _async_update_data(self) -> CoordinatorData:
         """Fetch data from API."""
@@ -78,88 +55,6 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
             self.data.system_faults = system_faults
             self.data.gsm = gsm
 
-            # Do not consume panel log events until panel_log_events_entity is ready,
-            # otherwise events could be lost before HA can fire them.
-            if self.panel_log_events_entity:
-
-                # Phase 1: lightweight "trigger" fetch.
-                # Fetch only a small number of the most recent log events to quickly check
-                # whether any new events appeared since the last poll.
-                #
-                # - `self.last_panel_log_events` is used to filter out already known events
-                # - The fetched list is not stored; we only check if there are any new events
-                # - If no new events are detected here, the heavier full fetch is skipped
-                _, trigger_new_events = await async_fetch_panel_log_events(
-                    last_panel_log_events = self.last_panel_log_events,
-                    client = self.client,
-                    limit = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER,
-                )
-
-                # If at least one new event is detected, perform a full fetch to ensure
-                # we do not miss any events that occurred between polling intervals.
-                if trigger_new_events:
-
-                    # Phase 2: authoritative fetch.
-                    # Fetch a larger window of recent log events and re-filter them against
-                    # the last known state to obtain the complete and correctly ordered list of new events.
-                    current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                        last_panel_log_events = self.last_panel_log_events,
-                        client = self.client,
-                        limit = self.panel_log_events_fetch_limit,
-                    )
-
-                    # Defensive max-limit fetch:
-                    # If the fetched window is fully saturated with new events, it may mean
-                    # more events occurred than the configured fetch limit. Perform a single
-                    # refetch using the maximum allowed window to reduce the risk of missing events.
-                    if (
-                        self.panel_log_events_fetch_limit < CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX and
-                        self.panel_log_events_fetch_limit == len(current_panel_log_events_filtered)
-                    ):
-                        current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                            last_panel_log_events = self.last_panel_log_events,
-                            client = self.client,
-                            limit = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
-                        )
-
-                    # If there are any new events after filtering
-                    if current_panel_log_events_filtered:
-
-                        # Pass the new events to the panel_log_events_entity to trigger HA events.
-                        # This will fire each event in PanelLogEventsEvent.
-                        await self.panel_log_events_entity.handle_events(
-                            current_panel_log_events_filtered,
-                        )
-
-                        # Update the stored full list of panel events and persist it.
-                        # Since there are new events, we are sure `current_panel_log_events` contains valid data.
-                        self.last_panel_log_events = current_panel_log_events
-                        await self.async_save_current_panel_log_events(
-                            self.last_panel_log_events,
-                        )
-
             return self.data
         except Exception as err:
             raise UpdateFailed(err) from err
-
-    async def async_load_last_panel_log_events(self):
-        """Load logs from HA storage."""
-        stored_data = await self.last_panel_log_events_store.async_load()
-        if stored_data and "logs" in stored_data:
-            last_panel_log_events = deserialize_panel_log_events(stored_data["logs"])
-        else:
-            last_panel_log_events = []
-        return last_panel_log_events
-
-    async def async_save_current_panel_log_events(
-            self,
-            current_panel_log_events: List[LogEvent]
-    ):
-        if current_panel_log_events:
-            await self.last_panel_log_events_store.async_save(
-                {"logs": serialize_panel_log_events(current_panel_log_events)}
-            )
-
-    async def async_startup(self) -> None:
-        """Load persisted data before first refresh."""
-        self.last_panel_log_events = await self.async_load_last_panel_log_events()

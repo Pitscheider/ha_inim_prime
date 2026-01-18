@@ -2,9 +2,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .const import DOMAIN
+from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
 from .coordinator import InimPrimeDataUpdateCoordinator
 from inim_prime import InimPrimeClient
+from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
@@ -15,23 +16,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api_key = entry.data["api_key"]
     use_https = entry.data.get("use_https", True)
 
-    # Crea client
     client = InimPrimeClient(host=host, api_key=api_key, use_https=use_https)
     await client.connect()
 
-    # Crea coordinator
-    coordinator = InimPrimeDataUpdateCoordinator(hass, client, entry)
-    await coordinator.async_startup()
-    await coordinator.async_config_entry_first_refresh()
+    main_coordinator = InimPrimeDataUpdateCoordinator(hass, client, entry)
+    panel_log_events_coordinator = InimPrimePanelLogEventsCoordinator(hass, client, entry)
 
-    # Salva nel dict di HA
+    await panel_log_events_coordinator.async_startup()
+    await panel_log_events_coordinator.async_config_entry_first_refresh()
+    await main_coordinator.async_config_entry_first_refresh()
+
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
-        "coordinator": coordinator,
+        "coordinator": main_coordinator,
+        PANEL_LOG_EVENTS_COORDINATOR: panel_log_events_coordinator,
     }
 
-    # Forward setup alle piattaforme
-    # Nuovo metodo corretto per HA 2025+
     await hass.config_entries.async_forward_entry_setups(
         entry = entry,
         platforms = [

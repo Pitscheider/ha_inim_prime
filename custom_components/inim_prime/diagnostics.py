@@ -7,8 +7,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from . import InimPrimeDataUpdateCoordinator
+from . import InimPrimeDataUpdateCoordinator, PANEL_LOG_EVENTS_COORDINATOR
 from .const import DOMAIN, CONF_SERIAL_NUMBER
+from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 
 
 async def async_get_config_entry_diagnostics(
@@ -67,7 +68,7 @@ async def async_get_device_diagnostics(
     """Return diagnostics for a device."""
 
     coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-
+    panel_log_events_coordinator: InimPrimePanelLogEventsCoordinator = hass.data[DOMAIN][config_entry.entry_id][PANEL_LOG_EVENTS_COORDINATOR]
     # Extract the device type and ID from the device identifiers
     device_info = {}
     for domain, dev_id in device.identifiers:
@@ -131,7 +132,7 @@ async def async_get_device_diagnostics(
                     "active_faults": [
                         fault.name for fault in coordinator.data.system_faults.faults
                     ],
-                    "log_events": coordinator.last_panel_log_events,
+                    "log_events": panel_log_events_coordinator.last_panel_log_events,
                 }
 
     return device_info

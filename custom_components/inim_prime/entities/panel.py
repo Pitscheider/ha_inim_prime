@@ -130,7 +130,7 @@ class PanelSupplyVoltageSensor(
         return system_faults.supply_voltage
 
 class PanelLogEventsEvent(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimePanelLogEventsCoordinator],
     EventEntity,
 ):
     _attr_name = "Log Events"

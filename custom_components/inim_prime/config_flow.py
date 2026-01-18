@@ -26,11 +26,11 @@ def build_connection_schema(
     schema: dict = {
         vol.Required(
             CONF_HOST,
-            default=default_host,
+            default = default_host,
         ): str,
         vol.Required(
             CONF_USE_HTTPS,
-            default=default_use_https,
+            default = default_use_https,
         ): bool,
     }
 
@@ -45,6 +45,25 @@ def build_connection_schema(
 
     return schema
 
+def build_optional_schema(
+    *,
+    default_panel_log_events_fetch_limit: int | None = None,
+) -> dict:
+    """Build the connection schema with optional defaults."""
+    schema: dict = {
+        vol.Required(
+            schema = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+            default = default_panel_log_events_fetch_limit or CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
+        ): vol.All(
+            int,
+            vol.Range(
+                min = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
+                max = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+            ),
+        ),
+    }
+
+    return schema
 
 
 class InimPrimeOptionsFlowHandler(OptionsFlow):
@@ -60,22 +79,15 @@ class InimPrimeOptionsFlowHandler(OptionsFlow):
 
         schema = vol.Schema(
             {
-                vol.Optional(
-                    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-                    default=self.config_entry.options.get(
-                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT
-                    ),
-                ): vol.All(int, vol.Range(
-                    min=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
-                    max=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
-                )),
+                **build_optional_schema(
+                    default_panel_log_events_fetch_limit = self.config_entry.options[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT],
+                ),
             }
         )
 
         return self.async_show_form(
-            step_id="init",
-            data_schema=schema,
+            step_id = "init",
+            data_schema = schema,
         )
 
 @config_entries.HANDLERS.register(DOMAIN)
@@ -100,9 +112,9 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 client = InimPrimeClient(
-                    host=conf_host,
-                    api_key=conf_api_key,
-                    use_https=conf_use_https,
+                    host = conf_host,
+                    api_key = conf_api_key,
+                    use_https = conf_use_https,
                 )
                 await client.connect()
                 await client.close()
@@ -110,14 +122,14 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 errors["base"] = "cannot_connect"
             else:
                 return self.async_create_entry(
-                    title=f"INIM Prime ({conf_serial_number})",
-                    data={
+                    title = f"INIM Prime ({conf_serial_number})",
+                    data = {
                         CONF_SERIAL_NUMBER: conf_serial_number,
                         CONF_HOST: conf_host,
                         CONF_API_KEY: conf_api_key,
                         CONF_USE_HTTPS: conf_use_https,
                     },
-                    options={
+                    options = {
                         CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: conf_panel_log_events_fetch_limit,
                     },
                 )
@@ -126,16 +138,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             {
                 vol.Required(CONF_SERIAL_NUMBER): str,
                 **build_connection_schema(),
-                vol.Required(
-                    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-                    default=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
-                ): vol.All(
-                    int,
-                    vol.Range(
-                        min=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
-                        max=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
-                    ),
-                ),
+                **build_optional_schema(),
             }
         )
 
@@ -185,9 +188,9 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         data_schema = vol.Schema(
             {
                 **build_connection_schema(
-                    default_host=entry.data[CONF_HOST],
-                    default_use_https=entry.options.get(CONF_USE_HTTPS, True),
-                    require_api_key=False,  # allow leaving it empty
+                    default_host = entry.data[CONF_HOST],
+                    default_use_https = entry.options.get(CONF_USE_HTTPS, True),
+                    require_api_key = False,  # allow leaving it empty
                 )
             }
         )

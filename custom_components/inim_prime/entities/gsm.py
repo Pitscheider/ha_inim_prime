@@ -86,7 +86,7 @@ class GSMSignalStrengthSensor(
     SensorEntity,
 ):
     _attr_name = "Signal Strength"
-    _attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
+    _attr_icon = "mdi:signal"
     _attr_native_unit_of_measurement = "%"
     _attr_state_class = SensorStateClass.MEASUREMENT
     _attr_entity_category = EntityCategory.DIAGNOSTIC

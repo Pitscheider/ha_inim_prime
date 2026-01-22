@@ -4,29 +4,29 @@ from homeassistant.components.select import SelectEntity
 from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
-
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from homeassistant.helpers.entity import DeviceInfo
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 from inim_prime.models.partition import SetPartitionModeRequest, PartitionMode, ClearPartitionAlarmMemoryRequest, \
     PartitionState, PartitionStatus
 
 
 def create_partition_device_info(
-    entry: ConfigEntry,
-    partition_id: int,
-    partition_name: str,
-    domain: str = DOMAIN,
+        entry: ConfigEntry,
+        partition_id: int,
+        partition_name: str,
+        domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{partition_id}")},
-        name=f"Partition {partition_name}",
-        model="Prime Partition",
-        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
-        via_device=(domain, entry.data[CONF_SERIAL_NUMBER]),
+        identifiers = {(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_partition_{partition_id}")},
+        name = f"Partition {partition_name}",
+        model = "Prime Partition",
+        manufacturer = INIM_PRIME_DEVICE_MANUFACTURER,
+        via_device = (domain, entry.data[CONF_SERIAL_NUMBER]),
     )
+
 
 class PartitionStateSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
@@ -53,7 +53,6 @@ class PartitionStateSensor(
             partition_id = self.partition_id,
             partition_name = partition.name,
         )
-
 
     @property
     def native_value(self) -> str | None:
@@ -101,8 +100,8 @@ class PartitionModeSelect(
         mode = PartitionMode[option]
 
         request = SetPartitionModeRequest(
-            partition_id=self.partition_id,
-            mode=mode,
+            partition_id = self.partition_id,
+            mode = mode,
         )
 
         await self.coordinator.client.set_partition_mode(request)
@@ -135,7 +134,7 @@ class ClearPartitionAlarmMemoryButton(
 
     async def async_press(self) -> None:
         request = ClearPartitionAlarmMemoryRequest(
-            partition_id=self.partition_id,
+            partition_id = self.partition_id,
         )
 
         await self.coordinator.client.clear_partition_alarm_memory(request)

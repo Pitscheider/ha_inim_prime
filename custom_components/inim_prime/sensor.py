@@ -1,8 +1,8 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.partition import PartitionStateSensor
 from custom_components.inim_prime.entities.gsm import GSMSupplyVoltageSensor, GSMOperatorSensor, \
     GSMSignalStrengthSensor, GSMCreditSensor
 from custom_components.inim_prime.entities.panel import PanelSupplyVoltageSensor, ExcludedZonesCountSensor
+from custom_components.inim_prime.entities.partition import PartitionStateSensor
 from custom_components.inim_prime.entities.zone import ZoneStateSensor
 
 
@@ -18,11 +18,11 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for partition in partitions.values():
         entities.append(PartitionStateSensor(coordinator, entry, partition))
 
-    entities.append(PanelSupplyVoltageSensor(coordinator,entry))
+    entities.append(PanelSupplyVoltageSensor(coordinator, entry))
     entities.append(GSMSupplyVoltageSensor(coordinator, entry))
     entities.append(GSMOperatorSensor(coordinator, entry))
     entities.append(GSMSignalStrengthSensor(coordinator, entry))
     entities.append(GSMCreditSensor(coordinator, entry))
     entities.append(ExcludedZonesCountSensor(coordinator, entry))
 
-    async_add_entities(entities, update_before_add=True)
+    async_add_entities(entities, update_before_add = True)

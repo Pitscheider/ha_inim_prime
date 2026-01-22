@@ -1,10 +1,12 @@
+from datetime import timedelta
+
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
-from .coordinator import InimPrimeDataUpdateCoordinator
 from inim_prime import InimPrimeClient
+from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
+from custom_components.inim_prime.coordinators.coordinator import InimPrimeDataUpdateCoordinator
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 
 
@@ -16,11 +18,22 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     api_key = entry.data["api_key"]
     use_https = entry.data.get("use_https", True)
 
-    client = InimPrimeClient(host=host, api_key=api_key, use_https=use_https)
+    client = InimPrimeClient(host = host, api_key = api_key, use_https = use_https)
     await client.connect()
 
-    main_coordinator = InimPrimeDataUpdateCoordinator(hass, client, entry)
-    panel_log_events_coordinator = InimPrimePanelLogEventsCoordinator(hass, client, entry)
+    main_coordinator = InimPrimeDataUpdateCoordinator(
+        hass = hass,
+        update_interval = timedelta(seconds = 10),
+        entry = entry,
+        client = client,
+    )
+
+    panel_log_events_coordinator = InimPrimePanelLogEventsCoordinator(
+        hass = hass,
+        update_interval = timedelta(seconds = 20),
+        entry = entry,
+        client = client,
+    )
 
     await panel_log_events_coordinator.async_startup()
     await panel_log_events_coordinator.async_config_entry_first_refresh()
@@ -46,10 +59,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     return True
 
+
 async def async_remove_config_entry_device(
-    hass: HomeAssistant,
-    config_entry: ConfigEntry,
-    device_entry: DeviceEntry,
+        hass: HomeAssistant,
+        config_entry: ConfigEntry,
+        device_entry: DeviceEntry,
 ) -> bool:
     """Allow removing sub-devices but not the panel."""
     for domain, dev_id in device_entry.identifiers:
@@ -58,6 +72,7 @@ async def async_remove_config_entry_device(
             return False
 
     return True
+
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload INIM Prime config entry."""

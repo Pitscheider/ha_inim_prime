@@ -1,9 +1,9 @@
+from datetime import datetime
 from typing import List, Optional
 
 from inim_prime import InimPrimeClient
 from inim_prime.helpers.log_events import filter_new_log_events
 from inim_prime.models import LogEvent
-from datetime import datetime
 
 
 # ───────────────
@@ -22,12 +22,12 @@ def serialize_panel_log_event(event: LogEvent) -> dict:
 
 def deserialize_panel_log_event(data: dict) -> LogEvent:
     return LogEvent(
-        id=data["id"],
-        timestamp=datetime.fromisoformat(data["timestamp"]),
-        type=data["type"],
-        agent=data.get("agent"),
-        location=data.get("location"),
-        value=data.get("value"),
+        id = data["id"],
+        timestamp = datetime.fromisoformat(data["timestamp"]),
+        type = data["type"],
+        agent = data.get("agent"),
+        location = data.get("location"),
+        value = data.get("value"),
     )
 
 
@@ -45,15 +45,15 @@ async def async_fetch_panel_log_events(
         limit: int,
 ) -> tuple[Optional[List[LogEvent]], Optional[List[LogEvent]]]:
     try:
-        current_panel_log_events = await client.get_log_events(limit=limit)
+        current_panel_log_events = await client.get_log_events(limit = limit)
     except Exception as e:
         # Return None in case of issues with the client
         return None, None
 
     # Compare with last saved logs
     current_panel_log_events_filtered = filter_new_log_events(
-        last_log_events=last_panel_log_events,
-        current_log_events=current_panel_log_events,
+        last_log_events = last_panel_log_events,
+        current_log_events = current_panel_log_events,
     )
 
     return current_panel_log_events, current_panel_log_events_filtered

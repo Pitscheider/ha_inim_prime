@@ -59,7 +59,6 @@ async def async_get_config_entry_diagnostics(
     }
 
 
-
 async def async_get_device_diagnostics(
         hass: HomeAssistant,
         config_entry: ConfigEntry,
@@ -68,7 +67,8 @@ async def async_get_device_diagnostics(
     """Return diagnostics for a device."""
 
     coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    panel_log_events_coordinator: InimPrimePanelLogEventsCoordinator = hass.data[DOMAIN][config_entry.entry_id][PANEL_LOG_EVENTS_COORDINATOR]
+    panel_log_events_coordinator: InimPrimePanelLogEventsCoordinator = hass.data[DOMAIN][config_entry.entry_id][
+        PANEL_LOG_EVENTS_COORDINATOR]
     # Extract the device type and ID from the device identifiers
     device_info = {}
     for domain, dev_id in device.identifiers:

@@ -3,24 +3,26 @@ from homeassistant.components.sensor import SensorEntity, SensorDeviceClass
 from homeassistant.components.switch import SwitchEntity, SwitchDeviceClass
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EntityCategory
+from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 from inim_prime.models import ZoneState, ZoneStatus, ZoneExclusionSetRequest
-from homeassistant.helpers.entity import DeviceInfo
+
 
 def create_zone_device_info(
-    entry: ConfigEntry,
-    zone_id: int,
-    zone_name: str,
-    domain: str = DOMAIN,
+        entry: ConfigEntry,
+        zone_id: int,
+        zone_name: str,
+        domain: str = DOMAIN,
 ) -> DeviceInfo:
     return DeviceInfo(
-        identifiers={(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{zone_id}")},
-        name=f"Zone {zone_name}",
-        model="Prime Zone",
-        manufacturer=INIM_PRIME_DEVICE_MANUFACTURER,
-        via_device=(domain, entry.data[CONF_SERIAL_NUMBER]),
+        identifiers = {(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_zone_{zone_id}")},
+        name = f"Zone {zone_name}",
+        model = "Prime Zone",
+        manufacturer = INIM_PRIME_DEVICE_MANUFACTURER,
+        via_device = (domain, entry.data[CONF_SERIAL_NUMBER]),
     )
 
 
@@ -58,6 +60,7 @@ class ZoneStateBinarySensor(
                 return False
         return None
 
+
 class ZoneStateSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     SensorEntity,
@@ -91,6 +94,7 @@ class ZoneStateSensor(
             return zone.state.name
         return None
 
+
 class ZoneAlarmMemoryBinarySensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
     BinarySensorEntity,
@@ -123,6 +127,7 @@ class ZoneAlarmMemoryBinarySensor(
         if zone:
             return zone.alarm_memory
         return None
+
 
 class ZoneExclusionSwitch(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
@@ -159,12 +164,12 @@ class ZoneExclusionSwitch(
 
     async def async_turn_on(self, **kwargs):
         """Set zone as excluded."""
-        request = ZoneExclusionSetRequest(zone_id=self.zone_id, exclude=True)
+        request = ZoneExclusionSetRequest(zone_id = self.zone_id, exclude = True)
         await self.coordinator.client.set_zone_exclusion(request)
         await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
         """Set zone as included."""
-        request = ZoneExclusionSetRequest(zone_id=self.zone_id, exclude=False)
+        request = ZoneExclusionSetRequest(zone_id = self.zone_id, exclude = False)
         await self.coordinator.client.set_zone_exclusion(request)
         await self.coordinator.async_request_refresh()

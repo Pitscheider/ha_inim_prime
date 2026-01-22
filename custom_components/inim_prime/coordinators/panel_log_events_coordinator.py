@@ -2,6 +2,8 @@ import logging
 from datetime import timedelta
 from typing import List
 
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -11,9 +13,11 @@ from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX
 from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
     serialize_panel_log_events, async_fetch_panel_log_events
+from inim_prime import InimPrimeClient
 from inim_prime.models import LogEvent
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
     """Coordinator to fetch panel log events independently."""
@@ -21,12 +25,18 @@ class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
     panel_log_events_entity = None
     last_panel_log_events: list[LogEvent] = []
 
-    def __init__(self, hass, client, entry):
+    def __init__(
+            self,
+            hass: HomeAssistant,
+            update_interval: timedelta,
+            entry: ConfigEntry,
+            client: InimPrimeClient,
+    ):
         super().__init__(
-            hass,
-            _LOGGER,
-            name="INIM Prime Panel Logs",
-            update_interval=timedelta(seconds=15),  # can be different from main coordinator
+            hass = hass,
+            logger = _LOGGER,
+            name = "INIM Prime Panel Logs",
+            update_interval = update_interval,
         )
         self.client = client
         self.entry = entry
@@ -59,9 +69,9 @@ class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
                 # - The fetched list is not stored; we only check if there are any new events
                 # - If no new events are detected here, the heavier full fetch is skipped
                 _, trigger_new_events = await async_fetch_panel_log_events(
-                    last_panel_log_events=self.last_panel_log_events,
-                    client=self.client,
-                    limit=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER,
+                    last_panel_log_events = self.last_panel_log_events,
+                    client = self.client,
+                    limit = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER,
                 )
 
                 # If at least one new event is detected, perform a full fetch to ensure
@@ -72,9 +82,9 @@ class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
                     # Fetch a larger window of recent log events and re-filter them against
                     # the last known state to obtain the complete and correctly ordered list of new events.
                     current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                        last_panel_log_events=self.last_panel_log_events,
-                        client=self.client,
-                        limit=self.panel_log_events_fetch_limit,
+                        last_panel_log_events = self.last_panel_log_events,
+                        client = self.client,
+                        limit = self.panel_log_events_fetch_limit,
                     )
 
                     # Defensive max-limit fetch:
@@ -86,9 +96,9 @@ class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
                             self.panel_log_events_fetch_limit == len(current_panel_log_events_filtered)
                     ):
                         current_panel_log_events, current_panel_log_events_filtered = await async_fetch_panel_log_events(
-                            last_panel_log_events=self.last_panel_log_events,
-                            client=self.client,
-                            limit=CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+                            last_panel_log_events = self.last_panel_log_events,
+                            client = self.client,
+                            limit = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
                         )
 
                     # If there are any new events after filtering

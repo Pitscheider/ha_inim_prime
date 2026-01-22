@@ -1,6 +1,6 @@
 from typing import Any
-import voluptuous as vol
 
+import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.core import callback
@@ -16,11 +16,12 @@ from custom_components.inim_prime.const import (
 )
 from inim_prime import InimPrimeClient
 
+
 def build_connection_schema(
-    *,
-    default_host: str | None = None,
-    default_use_https: bool = True,
-    require_api_key: bool = True,
+        *,
+        default_host: str | None = None,
+        default_use_https: bool = True,
+        require_api_key: bool = True,
 ) -> dict:
     """Build the connection schema with optional defaults."""
     schema: dict = {
@@ -36,18 +37,19 @@ def build_connection_schema(
 
     if require_api_key:
         schema[vol.Required(CONF_API_KEY)] = TextSelector(
-            TextSelectorConfig(type=TextSelectorType.PASSWORD)
+            TextSelectorConfig(type = TextSelectorType.PASSWORD)
         )
     else:
         schema[vol.Optional(CONF_API_KEY)] = TextSelector(
-            TextSelectorConfig(type=TextSelectorType.PASSWORD)
+            TextSelectorConfig(type = TextSelectorType.PASSWORD)
         )
 
     return schema
 
+
 def build_optional_schema(
-    *,
-    default_panel_log_events_fetch_limit: int | None = None,
+        *,
+        default_panel_log_events_fetch_limit: int | None = None,
 ) -> dict:
     """Build the connection schema with optional defaults."""
     schema: dict = {
@@ -75,7 +77,7 @@ class InimPrimeOptionsFlowHandler(OptionsFlow):
     ):
         """Manage options."""
         if user_input is not None:
-            return self.async_create_entry(title="", data=user_input)
+            return self.async_create_entry(title = "", data = user_input)
 
         schema = vol.Schema(
             {
@@ -90,8 +92,9 @@ class InimPrimeOptionsFlowHandler(OptionsFlow):
             data_schema = schema,
         )
 
+
 @config_entries.HANDLERS.register(DOMAIN)
-class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
     """Handle a config flow for INIM Prime integration."""
     VERSION = 1
     MINOR_VERSION = 0
@@ -134,7 +137,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     },
                 )
 
-        data_schema = vol.Schema (
+        data_schema = vol.Schema(
             {
                 vol.Required(CONF_SERIAL_NUMBER): str,
                 **build_connection_schema(),
@@ -162,9 +165,9 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             try:
                 client = InimPrimeClient(
-                    host=conf_host,
-                    api_key=conf_api_key or entry.data[CONF_API_KEY],
-                    use_https=conf_use_https,
+                    host = conf_host,
+                    api_key = conf_api_key or entry.data[CONF_API_KEY],
+                    use_https = conf_use_https,
                 )
                 await client.connect()
                 await client.close()

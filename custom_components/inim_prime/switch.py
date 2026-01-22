@@ -11,4 +11,4 @@ async def async_setup_entry(hass, entry, async_add_entities):
     for zone in zones.values():
         entities.append(ZoneExclusionSwitch(coordinator, entry, zone))
 
-    async_add_entities(entities, update_before_add=True)
+    async_add_entities(entities, update_before_add = True)

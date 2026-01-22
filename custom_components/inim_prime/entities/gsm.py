@@ -9,9 +9,9 @@ from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, C
 
 
 def create_gsm_device_info(
-    entry: ConfigEntry,
-    domain: str = DOMAIN,
-    sw_version: str = None
+        entry: ConfigEntry,
+        domain: str = DOMAIN,
+        sw_version: str = None
 ) -> DeviceInfo:
     return DeviceInfo(
         identifiers = {(domain, f"{entry.data[CONF_SERIAL_NUMBER]}_gsm")},
@@ -21,6 +21,7 @@ def create_gsm_device_info(
         via_device = (domain, entry.data[CONF_SERIAL_NUMBER]),
         sw_version = sw_version,
     )
+
 
 class GSMSupplyVoltageSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
@@ -42,8 +43,8 @@ class GSMSupplyVoltageSensor(
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_supply_voltage"
 
         self._attr_device_info = create_gsm_device_info(
-            entry=entry,
-            sw_version=self.coordinator.data.gsm.firmware_version,
+            entry = entry,
+            sw_version = self.coordinator.data.gsm.firmware_version,
         )
 
     @property
@@ -70,14 +71,15 @@ class GSMOperatorSensor(
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_operator"
 
         self._attr_device_info = create_gsm_device_info(
-            entry=entry,
-            sw_version=self.coordinator.data.gsm.firmware_version
+            entry = entry,
+            sw_version = self.coordinator.data.gsm.firmware_version
         )
 
     @property
     def native_value(self) -> str | None:
         gsm = self.coordinator.data.gsm
         return gsm.operator
+
 
 class GSMSignalStrengthSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
@@ -99,14 +101,15 @@ class GSMSignalStrengthSensor(
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_signal_strength"
 
         self._attr_device_info = create_gsm_device_info(
-            entry=entry,
-            sw_version=self.coordinator.data.gsm.firmware_version,
+            entry = entry,
+            sw_version = self.coordinator.data.gsm.firmware_version,
         )
 
     @property
     def native_value(self) -> float | None:
         gsm = self.coordinator.data.gsm
         return gsm.signal_strength
+
 
 class GSMCreditSensor(
     CoordinatorEntity[InimPrimeDataUpdateCoordinator],
@@ -126,8 +129,8 @@ class GSMCreditSensor(
         self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_gsm_credit"
 
         self._attr_device_info = create_gsm_device_info(
-            entry=entry,
-            sw_version=self.coordinator.data.gsm.firmware_version,
+            entry = entry,
+            sw_version = self.coordinator.data.gsm.firmware_version,
         )
 
     @property

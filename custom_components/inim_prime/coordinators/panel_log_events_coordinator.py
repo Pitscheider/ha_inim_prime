@@ -29,7 +29,7 @@ _LOGGER = logging.getLogger(__name__)
 
 
 class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
-    """Coordinator to fetch panel log events independently."""
+    # Coordinator to fetch panel log events independently.
     STORAGE_VERSION = 1
     panel_log_events_entity = None
     last_panel_log_events: list[LogEvent] = []
@@ -58,7 +58,7 @@ class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
 
     @property
     def panel_log_events_fetch_limit(self) -> int:
-        """Return the current panel log events fetch limit from options."""
+        # Return the current panel log events fetch limit from options.
         return self.config_entry.options.get(
             CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
             CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT

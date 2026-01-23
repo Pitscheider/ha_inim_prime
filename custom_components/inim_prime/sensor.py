@@ -1,4 +1,5 @@
-from . import InimPrimeDataUpdateCoordinator, DOMAIN
+from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from .const import DOMAIN
 from .entities.gsm import GSMSupplyVoltageSensor, GSMOperatorSensor, GSMSignalStrengthSensor, GSMCreditSensor
 from .entities.panel import PanelSupplyVoltageSensor, ExcludedZonesCountSensor
 from .entities.partition import PartitionStateSensor

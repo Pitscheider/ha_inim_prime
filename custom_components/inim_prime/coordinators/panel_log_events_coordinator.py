@@ -7,7 +7,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from const import (
+from ..const import (
     DOMAIN,
     CONF_SERIAL_NUMBER,
     STORAGE_KEY_LAST_PANEL_EVENT_LOGS,
@@ -16,7 +16,7 @@ from const import (
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER,
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
 )
-from helpers.panel_log_events import (
+from ..helpers.panel_log_events import (
     deserialize_panel_log_events,
     serialize_panel_log_events,
     async_fetch_panel_log_events,

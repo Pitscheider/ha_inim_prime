@@ -4,8 +4,8 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from const import DOMAIN, INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
+from ..coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from ..const import DOMAIN, INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 
 
 def create_gsm_device_info(

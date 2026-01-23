@@ -6,8 +6,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from . import InimPrimeDataUpdateCoordinator, PANEL_LOG_EVENTS_COORDINATOR
-from .const import DOMAIN, CONF_SERIAL_NUMBER
+from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from .const import DOMAIN, CONF_SERIAL_NUMBER, PANEL_LOG_EVENTS_COORDINATOR
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 
 

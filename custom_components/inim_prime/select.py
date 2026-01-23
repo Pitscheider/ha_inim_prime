@@ -1,4 +1,5 @@
-from . import InimPrimeDataUpdateCoordinator, DOMAIN
+from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from .const import DOMAIN
 from .entities.partition import PartitionModeSelect
 
 

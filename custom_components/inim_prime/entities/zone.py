@@ -6,8 +6,8 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
+from ..coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from ..const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
 from inim_prime_api.models.zone import ZoneState, ZoneStatus, ZoneExclusionSetRequest
 
 

@@ -54,7 +54,7 @@ def build_optional_schema(
     """Build the connection schema with optional defaults."""
     schema: dict = {
         vol.Required(
-            schema = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+            CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
             default = default_panel_log_events_fetch_limit or CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
         ): vol.All(
             int,

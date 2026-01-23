@@ -5,10 +5,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
 
-from custom_components.inim_prime.const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
-from custom_components.inim_prime.coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from custom_components.inim_prime.coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
-from inim_prime import InimPrimeClient
+from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
+from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
+from inim_prime_api import InimPrimeClient
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:

@@ -7,9 +7,9 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
-from inim_prime.models.partition import (
+from coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
+from inim_prime_api.models.partition import (
     SetPartitionModeRequest,
     PartitionMode,
     ClearPartitionAlarmMemoryRequest,

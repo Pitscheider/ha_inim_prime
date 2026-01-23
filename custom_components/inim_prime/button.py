@@ -1,6 +1,6 @@
-from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.panel import IncludeAllZonesButton, ClearAllPartitionsAlarmMemoryButton
-from custom_components.inim_prime.entities.partition import ClearPartitionAlarmMemoryButton
+from . import InimPrimeDataUpdateCoordinator, DOMAIN
+from .entities.panel import IncludeAllZonesButton, ClearAllPartitionsAlarmMemoryButton
+from .entities.partition import ClearPartitionAlarmMemoryButton
 
 
 async def async_setup_entry(hass, entry, async_add_entities):

@@ -6,9 +6,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, PANEL_LOG_EVENTS_COORDINATOR
-from custom_components.inim_prime.const import DOMAIN, CONF_SERIAL_NUMBER
-from custom_components.inim_prime.coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
+from . import InimPrimeDataUpdateCoordinator, PANEL_LOG_EVENTS_COORDINATOR
+from .const import DOMAIN, CONF_SERIAL_NUMBER
+from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 
 
 async def async_get_config_entry_diagnostics(

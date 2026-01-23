@@ -1,6 +1,6 @@
-from custom_components.inim_prime import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
-from custom_components.inim_prime.coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
-from custom_components.inim_prime.entities.panel import PanelLogEventsEvent
+from . import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
+from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
+from .entities.panel import PanelLogEventsEvent
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:

@@ -1,5 +1,5 @@
-from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.partition import PartitionModeSelect
+from . import InimPrimeDataUpdateCoordinator, DOMAIN
+from .entities.partition import PartitionModeSelect
 
 
 async def async_setup_entry(hass, entry, async_add_entities):

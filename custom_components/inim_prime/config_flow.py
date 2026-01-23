@@ -6,7 +6,7 @@ from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.core import callback
 from homeassistant.helpers.selector import TextSelector, TextSelectorType, TextSelectorConfig
 
-from custom_components.inim_prime.const import (
+from .const import (
     CONF_HOST,
     CONF_API_KEY,
     CONF_USE_HTTPS,
@@ -14,7 +14,7 @@ from custom_components.inim_prime.const import (
     DOMAIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
 )
-from inim_prime import InimPrimeClient
+from inim_prime_api import InimPrimeClient
 
 
 def build_connection_schema(

@@ -1,10 +1,10 @@
 {
   "domain": "inim_prime",
   "name": "Inim Prime",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "documentation": "https://github.com/Pitscheider/ha_inim_prime",
   "requirements": [
-    "inim_prime_api @ https://github.com/Pitscheider/inim_prime_api/archive/refs/tags/v0.1.2.zip"
+    "inim_prime_api @ https://github.com/Pitscheider/inim_prime_api/archive/refs/tags/v0.1.3.zip"
   ],
   "codeowners": [
     "@Pitscheider"

@@ -1,6 +1,6 @@
-from inim_prime import InimPrimeClient
-from inim_prime.models import PartitionStatus
-from inim_prime.models.partition import ClearPartitionAlarmMemoryRequest
+from .. import InimPrimeClient
+
+from ..models.partition import ClearPartitionAlarmMemoryRequest, PartitionStatus
 
 
 def get_partitions_with_alarm_memory(

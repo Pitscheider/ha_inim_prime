@@ -5,7 +5,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
 from .entities.panel import create_panel_device_info
-from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
+from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR, CONF_SERIAL_NUMBER
 from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 from inim_prime_api import InimPrimeClient
@@ -71,7 +71,7 @@ async def async_remove_config_entry_device(
     """Allow removing sub-devices but not the panel."""
     for domain, dev_id in device_entry.identifiers:
         # Prevent deleting the panel itself
-        if dev_id == config_entry.entry_id:
+        if dev_id == config_entry.data[CONF_SERIAL_NUMBER]:
             return False
 
     return True

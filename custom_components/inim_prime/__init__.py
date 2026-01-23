@@ -4,7 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-
+from .entities.panel import create_panel_device_info
 from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR
 from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
@@ -14,6 +14,8 @@ from inim_prime_api import InimPrimeClient
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up INIM Prime integration."""
     hass.data.setdefault(DOMAIN, {})
+
+    create_panel_device_info(entry)
 
     host = entry.data["host"]
     api_key = entry.data["api_key"]

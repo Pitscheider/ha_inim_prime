@@ -8,7 +8,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from custom_components.inim_prime import DOMAIN
-from custom_components.inim_prime.api.inim_prime import InimPrimeClient
+from inim_prime import InimPrimeClient
 
 from custom_components.inim_prime.const import (
     CONF_SERIAL_NUMBER,
@@ -23,7 +23,7 @@ from custom_components.inim_prime.helpers.panel_log_events import (
     serialize_panel_log_events,
     async_fetch_panel_log_events,
 )
-from custom_components.inim_prime.api.inim_prime.models.log_event import LogEvent
+from inim_prime.models.log_event import LogEvent
 
 _LOGGER = logging.getLogger(__name__)
 

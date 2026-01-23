@@ -14,7 +14,7 @@ from custom_components.inim_prime.const import (
     DOMAIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
 )
-from custom_components.inim_prime.api.inim_prime import InimPrimeClient
+from inim_prime import InimPrimeClient
 
 
 def build_connection_schema(

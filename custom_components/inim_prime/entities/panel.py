@@ -12,10 +12,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 from custom_components.inim_prime.coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
-from custom_components.inim_prime.api.inim_prime.helpers.partitions import clear_all_partitions_alarm_memory
-from custom_components.inim_prime.api.inim_prime.helpers.zones import include_all_zones
-from custom_components.inim_prime.api.inim_prime.models.system_faults import SystemFault
-from custom_components.inim_prime.api.inim_prime.models.log_event import LogEvent
+from inim_prime.helpers.partitions import clear_all_partitions_alarm_memory
+from inim_prime.helpers.zones import include_all_zones
+from inim_prime.models.system_faults import SystemFault
+from inim_prime.models.log_event import LogEvent
 
 
 def create_panel_device_info(

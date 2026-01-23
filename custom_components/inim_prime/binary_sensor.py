@@ -1,8 +1,9 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.api.inim_prime.models.system_faults import EXPOSED_SYSTEM_FAULTS
+
 from custom_components.inim_prime.entities.panel import SystemFaultBinarySensor
 from custom_components.inim_prime.entities.partition import PartitionAlarmMemoryBinarySensor
 from custom_components.inim_prime.entities.zone import ZoneStateBinarySensor, ZoneAlarmMemoryBinarySensor
+from inim_prime.models.system_faults import EXPOSED_SYSTEM_FAULTS
 
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:

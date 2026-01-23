@@ -23,7 +23,7 @@ from custom_components.inim_prime.helpers.panel_log_events import (
     serialize_panel_log_events,
     async_fetch_panel_log_events,
 )
-from inim_prime.models.log_event import LogEvent
+from custom_components.inim_prime.api.inim_prime.models.log_event import LogEvent
 
 _LOGGER = logging.getLogger(__name__)
 

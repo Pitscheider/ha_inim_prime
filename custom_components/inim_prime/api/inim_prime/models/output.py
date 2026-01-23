@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from enum import IntEnum
 from typing import Optional
 
-from inim_prime.models.panel_item import PanelItemStatus
+from .panel_item import PanelItemStatus
 
 
 class OutputType(IntEnum):

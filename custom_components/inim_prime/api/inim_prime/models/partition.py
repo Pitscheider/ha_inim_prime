@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from enum import IntEnum
 
-from inim_prime.models import PanelItemStatus
+from .panel_item import PanelItemStatus
 
 
 class PartitionMode(IntEnum):

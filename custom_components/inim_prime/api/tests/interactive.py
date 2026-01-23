@@ -1,12 +1,13 @@
 import asyncio
 import sys
 
-from inim_prime import InimPrimeClient
-from inim_prime.helpers.zones import get_excluded_zones, include_all_zones
-from inim_prime.models import ZoneExclusionSetRequest
-from inim_prime.models.output import OutputSetRequest
-from inim_prime.models.partition import PartitionMode, SetPartitionModeRequest
-from inim_prime.models.scenario import ActivateScenarioRequest
+from ..inim_prime.models.zone import ZoneExclusionSetRequest
+from ..inim_prime import InimPrimeClient
+from ..inim_prime.helpers.zones import get_excluded_zones, include_all_zones
+
+from ..inim_prime.models.output import OutputSetRequest
+from ..inim_prime.models.partition import PartitionMode, SetPartitionModeRequest
+from ..inim_prime.models.scenario import ActivateScenarioRequest
 
 if sys.platform == "win32":
     # Use SelectorEventLoop for Windows compatibility

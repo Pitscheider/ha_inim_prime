@@ -1,5 +1,3 @@
-# exceptions.py
-
 class InimPrimeError(Exception):
     """Base exception for all Inim Prime errors."""
     pass

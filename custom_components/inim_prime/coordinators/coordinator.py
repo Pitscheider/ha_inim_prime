@@ -8,9 +8,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from custom_components.inim_prime.api.inim_prime import InimPrimeClient
-from custom_components.inim_prime.api.inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus
 from custom_components.inim_prime.api.inim_prime.models.partition import PartitionStatus
 from custom_components.inim_prime.api.inim_prime.models.zone import ZoneStatus
+from inim_prime.models.gsm import GSMSStatus
+from inim_prime.models.output import OutputStatus
+from inim_prime.models.system_faults import SystemFaultsStatus
 
 _LOGGER = logging.getLogger(__name__)
 

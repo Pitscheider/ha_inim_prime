@@ -9,8 +9,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
 from custom_components.inim_prime.const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
-from inim_prime.models.partition import SetPartitionModeRequest, PartitionMode, ClearPartitionAlarmMemoryRequest, \
-    PartitionState, PartitionStatus
+from custom_components.inim_prime.api.inim_prime.models.partition import SetPartitionModeRequest, PartitionMode, ClearPartitionAlarmMemoryRequest, PartitionState, PartitionStatus
 
 
 def create_partition_device_info(

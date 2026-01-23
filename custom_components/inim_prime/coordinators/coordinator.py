@@ -7,10 +7,10 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
-from inim_prime import InimPrimeClient
-from inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus
-from inim_prime.models.partition import PartitionStatus
-from inim_prime.models.zone import ZoneStatus
+from custom_components.inim_prime.api.inim_prime import InimPrimeClient
+from custom_components.inim_prime.api.inim_prime.models import OutputStatus, SystemFaultsStatus, GSMSStatus
+from custom_components.inim_prime.api.inim_prime.models.partition import PartitionStatus
+from custom_components.inim_prime.api.inim_prime.models.zone import ZoneStatus
 
 _LOGGER = logging.getLogger(__name__)
 

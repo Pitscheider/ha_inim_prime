@@ -8,13 +8,21 @@ from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from custom_components.inim_prime import DOMAIN
-from custom_components.inim_prime.const import CONF_SERIAL_NUMBER, \
-    STORAGE_KEY_LAST_PANEL_EVENT_LOGS, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT, \
-    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX
-from custom_components.inim_prime.helpers.panel_log_events import deserialize_panel_log_events, \
-    serialize_panel_log_events, async_fetch_panel_log_events
-from inim_prime import InimPrimeClient
-from inim_prime.models import LogEvent
+from custom_components.inim_prime.api.inim_prime import InimPrimeClient
+from custom_components.inim_prime.api.inim_prime.models import LogEvent
+from custom_components.inim_prime.const import (
+    CONF_SERIAL_NUMBER,
+    STORAGE_KEY_LAST_PANEL_EVENT_LOGS,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_TRIGGER,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+)
+from custom_components.inim_prime.helpers.panel_log_events import (
+    deserialize_panel_log_events,
+    serialize_panel_log_events,
+    async_fetch_panel_log_events,
+)
 
 _LOGGER = logging.getLogger(__name__)
 

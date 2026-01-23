@@ -1,6 +1,5 @@
 from custom_components.inim_prime import InimPrimeDataUpdateCoordinator, DOMAIN
-from custom_components.inim_prime.entities.gsm import GSMSupplyVoltageSensor, GSMOperatorSensor, \
-    GSMSignalStrengthSensor, GSMCreditSensor
+from custom_components.inim_prime.entities.gsm import GSMSupplyVoltageSensor, GSMOperatorSensor, GSMSignalStrengthSensor, GSMCreditSensor
 from custom_components.inim_prime.entities.panel import PanelSupplyVoltageSensor, ExcludedZonesCountSensor
 from custom_components.inim_prime.entities.partition import PartitionStateSensor
 from custom_components.inim_prime.entities.zone import ZoneStateSensor

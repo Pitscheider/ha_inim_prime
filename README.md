@@ -146,9 +146,7 @@ In order to determine which logs are new, the integration perform a check betwee
 To reduce the number of logs retrieved at the end of every cycle, the integration only fetch 3 logs per cycle. It uses this small pool of logs to determine if new logs appeared. This way most of the time, when no new log will be there, the operation will be fast.
 In case it determines that new logs are there, it performs a new request asking for a number of logs equal to `panel_log_events_fetch_limit`.
 In the rare case that `panel_log_events_fetch_limit` value is completely filled with new logs, the integration will perform a new request asking for the safe maximum amount of logs, which is currently 100.
-
 It is important to note that every log has the same category `generic`, since I haven't been able to map all the possible categories. So, the actual information of the logs, are contained in attributes. Home Assistant do not provide an embedded way to show those logs correctly, but by using a custom UI component, it is possible to see them in order. Check the `Log Events` section to discover how to enable that.
-
 The event entity has been chosen, since it is the most suitable across the Home Assistant one. Still, it is a workaround to store logs, since Home Assistant does not have a better way to do so (or at least I haven't found it).   
    
 ### Configuration   

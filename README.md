@@ -29,10 +29,14 @@ The manual for the setup of the Inim PrimeLAN card can be found there: [Inim Pri
 In order to use this integration, you need to edit you panel configuration. You can do so by installing the Prime/STUDIO software on Windows.   
 You can download the latest version of the software there: [Inim Prime/STUDIO](https://download.sicurit.cz/EZS/INIM/_Prime/Prime%20Studio/).   
 ### Connect to the panel   
-Once you have installed the software, open it, and you should have this view:   
-!  
-Click on `Open panel connected`, and then select `Prime LAN`:   
-!   
+Once you have installed the software, open it, and you should have this view:
+
+<img width="2560" height="1382" alt="img00" src="https://github.com/user-attachments/assets/9a2017b5-a9d2-4dc2-91ef-f195e755ffc7" />
+
+Click on `Open panel connected`, and then select `Prime LAN`:
+
+<img width="905" height="495" alt="img01" src="https://github.com/user-attachments/assets/9507ebab-88d9-46d6-84a3-f51cedd98854" />
+
 Type the panel IP and password and click on `Next`.   
 Once the communication channel has been checked, you should be able to see that a panel as been detected, the firmware version and the serial number.   
 It is **FUNDAMENTAL** to copy the serial number correctly from that view and store it, since it will be needed later on during the configuration in Home Assistant.   
@@ -40,33 +44,49 @@ Once you have copied the serial number, you can click on `Open the panel`.
 ### Make a backup of the configuration   
 The first thing I strongly advise you to do, if you haven't already is making a copy of your panel configuration.   
 To do so, first download the current configuration by clicking on the `Download` icon in the upper left corner.   
-!  
+
+<img width="634" height="113" alt="img02" src="https://github.com/user-attachments/assets/14a5bdee-61f4-4811-a8a0-f3a0932b18a2" />
+
 It will take a while, but once it has finished you can click on `Save`, choose a name and click `OK`.   
 Now you have saved your config, and in case you mess up with something, you can just click on `Open`, choose the saved configuration, open it and then press on the `Upload` icon in order to restore the old setup.   
 Before doing any operation, I suggest to read the current config.   
 ### Check network settings   
 Once you have backed up the panel, click on `Control panel parameters` on the left panel:   
-!
+
+<img width="265" height="603" alt="img03" src="https://github.com/user-attachments/assets/6f3d5703-8dd9-416a-8562-cd8c72a93674" />
+
 Then click on IP connection parameters:   
-!   
+
+<img width="693" height="83" alt="img04" src="https://github.com/user-attachments/assets/283bb9bc-3dec-4172-b275-bf16d8bb2944" />
+
 There you should check if your panel has `Obtain an IP address automatically` enabled.   
 In case it is enabled, your panel will be using connection parameters obtained from the DHCP.    
 That could cause problems later, since in Home Assistant we need a static IP or at least a hostname.   
 If you want to keep DHCP enabled, you should reserve a static IP address for your Inim Prime panel in your DHCP server. Bear in mind, if you are not very familiar with networking, that usually is your router that act also as a DHCP server and that if you change options there, you should be changing them in case you replace it.   
 If you prefer to disable DHCP or you already have it disabled, you can just set your preferred parameters and take note of the IP address in order to use it later in the integration configuration.   
 Once you have made the changes, be sure to upload the updated configuration by clicking on `Upload` in the upper bar:   
-!
+
+<img width="557" height="99" alt="img05" src="https://github.com/user-attachments/assets/cbf3c2b3-b2b0-44d0-8ddf-d0ca6fd3612c" />
+
 ### Upgrade the firmware   
 Once you have checked you connection parameters, I suggest to update the firmware of the Inim Prime panel, by clicking on:   
-!  
+
+<img width="112" height="102" alt="img06" src="https://github.com/user-attachments/assets/79168438-cfd7-42e8-93f4-d3dfaf3d19d9" />
+
 which is placed in the upper right corner. The update procedure is simple.   
 ### Configure PrimeLAN settings   
 Once the panel is updated click on `PrimeLAN settings` on the left panel:   
-!  
+
+<img width="298" height="603" alt="img07" src="https://github.com/user-attachments/assets/1d949b2c-cdca-49a8-b6c6-d9b8feb2ed98" />
+
 Before performing any operations, load the current configuration, by clicking on the download icon in the upper left corner (it might take a while):   
-!
-Once the configuration has been loaded click on `Web API` in the upper right corner:   
-!    
+
+<img width="940" height="1019" alt="img08" src="https://github.com/user-attachments/assets/2bf70476-4c85-4044-9e19-081b6c6b6223" />
+
+Once the configuration has been loaded click on `Web API` in the upper right corner:
+
+<img width="915" height="964" alt="img09" src="https://github.com/user-attachments/assets/c6742134-35d5-4fe2-b3bb-e82b51f3140d" />
+
 There you should firstly enable the `API HTTP/HTTPS enable` toggle, then click on `Generates` to create a new API Key.   
 You will need the API Key later for the Home Assistant configuration. Bear in mind that the API Key gives access to most of the panel's features, so if you believe it might have been compromised, you can go back there and generate a new one (remember that you will also need to upload the new configuration after!).   
 Once you have generated the key, you should select which `Code` the Web API will use in order to perform the operations. My suggestion is to create a Web API code that will be used only for that scope. The creation of a new code will not be covered here, but it's pretty simple, just remember to load the current configuration before making changes and to upload the new one once you have finished.   

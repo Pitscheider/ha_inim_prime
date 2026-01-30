@@ -2,8 +2,7 @@
 This custom integration allows Home Assistant to communicate with **Inim Prime alarm panels** via the PrimeLAN network interface.   
 It provides monitoring and limited control of panels, partitions, zones, diagnostics, and event logs by using the official Inim Web API.   
 This project is **community-developed**, **not affiliated with INIM Electronics**, and is intended to complement — not replace — the official Inim software.   
-   
-# Table of contents   
+
 # Disclaimer   
 This integration is provided **as-is** and is currently under active development.   
 It should be considered **experimental**.   

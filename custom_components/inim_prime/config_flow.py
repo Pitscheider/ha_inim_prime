@@ -6,8 +6,6 @@ from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.core import callback
 from homeassistant.helpers.selector import TextSelector, TextSelectorType, TextSelectorConfig
 
-from const import CONF_MAIN_SCAN_INTERVAL, CONF_MAIN_SCAN_INTERVAL_DEFAULT, CONF_SCAN_INTERVAL_MIN, \
-    CONF_SCAN_INTERVAL_MAX, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT
 from .const import (
     CONF_HOST,
     CONF_API_KEY,
@@ -15,6 +13,12 @@ from .const import (
     CONF_SERIAL_NUMBER,
     DOMAIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN, CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+    CONF_MAIN_SCAN_INTERVAL,
+    CONF_MAIN_SCAN_INTERVAL_DEFAULT,
+    CONF_SCAN_INTERVAL_MIN,
+    CONF_SCAN_INTERVAL_MAX,
+    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
 )
 from inim_prime_api import InimPrimeClient
 

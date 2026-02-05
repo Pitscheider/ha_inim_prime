@@ -4,11 +4,14 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from const import PARTITIONS_COORDINATOR, GSM_COORDINATOR, SYSTEM_FAULTS_COORDINATOR
-from coordinators.gsm_coordinator import InimPrimeGSMUpdateCoordinator
-from coordinators.partitions_coordinator import InimPrimePartitionsUpdateCoordinator
-from coordinators.system_faults_coordinator import InimPrimeSystemFaultsUpdateCoordinator
-from coordinators.zones_coordinator import InimPrimeZonesUpdateCoordinator
+from coordinators import (
+    InimPrimeGSMUpdateCoordinator,
+    InimPrimePartitionsUpdateCoordinator,
+    InimPrimeZonesUpdateCoordinator,
+    InimPrimePanelLogEventsCoordinator,
+    InimPrimeSystemFaultsUpdateCoordinator,
+)
+
 from inim_prime_api import InimPrimeClient
 from .const import (
     CONF_SERIAL_NUMBER,
@@ -23,8 +26,7 @@ from .const import (
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
 )
-from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
+
 from .entities.panel import create_panel_device_info
 
 PLATFORMS = [

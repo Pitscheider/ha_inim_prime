@@ -16,11 +16,21 @@ from .const import (
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
     CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
-    CONF_MAIN_SCAN_INTERVAL,
-    CONF_MAIN_SCAN_INTERVAL_DEFAULT,
     CONF_SCAN_INTERVAL_MIN,
     CONF_SCAN_INTERVAL_MAX,
+
+    # --- Scan interval config keys ---
+    CONF_ZONES_SCAN_INTERVAL,
+    CONF_PARTITIONS_SCAN_INTERVAL,
+    CONF_GSM_SCAN_INTERVAL,
+    CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+
+    # --- Defaults (custom per coordinator) ---
+    CONF_ZONES_SCAN_INTERVAL_DEFAULT,
+    CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
+    CONF_GSM_SCAN_INTERVAL_DEFAULT,
+    CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
 )
 
@@ -60,7 +70,10 @@ def build_connection_schema(
 def build_optional_schema(
         *,
         default_panel_log_events_fetch_limit: int | None = None,
-        default_main_scan_interval: int | None = None,
+        default_zones_scan_interval: int | None = None,
+        default_partitions_scan_interval: int | None = None,
+        default_gsm_scan_interval: int | None = None,
+        default_system_faults_scan_interval: int | None = None,
         default_panel_log_events_scan_interval: int | None = None,
 ) -> dict:
     """Build the connection schema with optional defaults."""
@@ -77,16 +90,40 @@ def build_optional_schema(
             ),
         ),
 
-        # Main Scan Interval
+        # Zones Scan Interval
         vol.Required(
-            schema = CONF_MAIN_SCAN_INTERVAL,
-            default = default_main_scan_interval or CONF_MAIN_SCAN_INTERVAL_DEFAULT,
+            CONF_ZONES_SCAN_INTERVAL,
+            default = default_zones_scan_interval or CONF_ZONES_SCAN_INTERVAL_DEFAULT,
         ): vol.All(
             int,
-            vol.Range(
-                min = CONF_SCAN_INTERVAL_MIN,
-                max = CONF_SCAN_INTERVAL_MAX,
-            ),
+            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+        ),
+
+        # Partitions Scan Interval
+        vol.Required(
+            CONF_PARTITIONS_SCAN_INTERVAL,
+            default = default_partitions_scan_interval or CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
+        ): vol.All(
+            int,
+            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+        ),
+
+        # GSM Scan Interval
+        vol.Required(
+            CONF_GSM_SCAN_INTERVAL,
+            default = default_gsm_scan_interval or CONF_GSM_SCAN_INTERVAL_DEFAULT,
+        ): vol.All(
+            int,
+            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+        ),
+
+        # System Faults Scan Interval
+        vol.Required(
+            CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
+            default = default_system_faults_scan_interval or CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
+        ): vol.All(
+            int,
+            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
         ),
 
         # Panel Log Events Scan Interval
@@ -119,16 +156,28 @@ class InimPrimeOptionsFlowHandler(OptionsFlow):
         schema = vol.Schema(
             {
                 **build_optional_schema(
-                    default_panel_log_events_fetch_limit = self.config_entry.options.get(
-                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+                    default_zones_scan_interval = self.config_entry.options.get(
+                        CONF_ZONES_SCAN_INTERVAL,
                         None,
                     ),
-                    default_main_scan_interval = self.config_entry.options.get(
-                        CONF_MAIN_SCAN_INTERVAL,
+                    default_partitions_scan_interval = self.config_entry.options.get(
+                        CONF_PARTITIONS_SCAN_INTERVAL,
+                        None,
+                    ),
+                    default_gsm_scan_interval = self.config_entry.options.get(
+                        CONF_GSM_SCAN_INTERVAL,
+                        None,
+                    ),
+                    default_system_faults_scan_interval = self.config_entry.options.get(
+                        CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
                         None,
                     ),
                     default_panel_log_events_scan_interval = self.config_entry.options.get(
                         CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+                        None,
+                    ),
+                    default_panel_log_events_fetch_limit = self.config_entry.options.get(
+                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
                         None,
                     ),
                 ),
@@ -157,8 +206,12 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
             conf_use_https: bool = user_input.get(CONF_USE_HTTPS, True)
             conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
             conf_panel_log_events_fetch_limit: int = user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT]
-            conf_main_scan_interval: int = user_input[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
-            conf_panel_log_events_scan_interval: int = user_input[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
+
+            conf_zones_scan_interval = user_input[CONF_ZONES_SCAN_INTERVAL]
+            conf_partitions_scan_interval = user_input[CONF_PARTITIONS_SCAN_INTERVAL]
+            conf_gsm_scan_interval = user_input[CONF_GSM_SCAN_INTERVAL]
+            conf_system_faults_scan_interval = user_input[CONF_SYSTEM_FAULTS_SCAN_INTERVAL]
+            conf_panel_log_events_scan_interval = user_input[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
 
             await self.async_set_unique_id(conf_serial_number)
             self._abort_if_unique_id_configured()
@@ -184,7 +237,10 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
                     },
                     options = {
                         CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: conf_panel_log_events_fetch_limit,
-                        CONF_MAIN_SCAN_INTERVAL: conf_main_scan_interval,
+                        CONF_ZONES_SCAN_INTERVAL: conf_zones_scan_interval,
+                        CONF_PARTITIONS_SCAN_INTERVAL: conf_partitions_scan_interval,
+                        CONF_GSM_SCAN_INTERVAL: conf_gsm_scan_interval,
+                        CONF_SYSTEM_FAULTS_SCAN_INTERVAL: conf_system_faults_scan_interval,
                         CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL: conf_panel_log_events_scan_interval,
                     },
                 )

@@ -16,14 +16,26 @@ from inim_prime_api import InimPrimeClient
 from .const import (
     CONF_SERIAL_NUMBER,
     DOMAIN,
+
+# --- Coordinators ---
     PANEL_LOG_EVENTS_COORDINATOR,
     ZONES_COORDINATOR,
     PARTITIONS_COORDINATOR,
     GSM_COORDINATOR,
     SYSTEM_FAULTS_COORDINATOR,
-    CONF_MAIN_SCAN_INTERVAL,
-    CONF_MAIN_SCAN_INTERVAL_DEFAULT,
+
+# --- Scan interval config keys ---
+    CONF_ZONES_SCAN_INTERVAL,
+    CONF_PARTITIONS_SCAN_INTERVAL,
+    CONF_GSM_SCAN_INTERVAL,
+    CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+
+# --- Defaults (custom per coordinator) ---
+    CONF_ZONES_SCAN_INTERVAL_DEFAULT,
+    CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
+    CONF_GSM_SCAN_INTERVAL_DEFAULT,
+    CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
 )
 
@@ -57,31 +69,49 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ###
     ### Coordinators
     ###
-    main_scan_interval = entry.options.get(CONF_MAIN_SCAN_INTERVAL, CONF_MAIN_SCAN_INTERVAL_DEFAULT)
-    panel_log_events_scan_interval = entry.options.get(CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT)
+    zones_scan_interval = entry.options.get(
+        CONF_ZONES_SCAN_INTERVAL,
+        CONF_ZONES_SCAN_INTERVAL_DEFAULT,
+    )
+    partitions_scan_interval = entry.options.get(
+        CONF_PARTITIONS_SCAN_INTERVAL,
+        CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
+    )
+    gsm_scan_interval = entry.options.get(
+        CONF_GSM_SCAN_INTERVAL,
+        CONF_GSM_SCAN_INTERVAL_DEFAULT,
+    )
+    system_faults_scan_interval = entry.options.get(
+        CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
+        CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
+    )
+    panel_log_events_scan_interval = entry.options.get(
+        CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+        CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
+    )
 
     coordinators = {
         ZONES_COORDINATOR: InimPrimeZonesUpdateCoordinator(
             hass = hass,
-            update_interval = timedelta(seconds = main_scan_interval),
+            update_interval = timedelta(seconds = zones_scan_interval),
             entry = entry,
             client = client,
         ),
         PARTITIONS_COORDINATOR: InimPrimePartitionsUpdateCoordinator(
             hass = hass,
-            update_interval = timedelta(seconds = main_scan_interval),
+            update_interval = timedelta(seconds = partitions_scan_interval),
             entry = entry,
             client = client,
         ),
         SYSTEM_FAULTS_COORDINATOR: InimPrimeSystemFaultsUpdateCoordinator(
             hass = hass,
-            update_interval = timedelta(seconds = main_scan_interval),
+            update_interval = timedelta(seconds = system_faults_scan_interval),
             entry = entry,
             client = client,
         ),
         GSM_COORDINATOR: InimPrimeGSMUpdateCoordinator(
             hass = hass,
-            update_interval = timedelta(seconds = main_scan_interval),
+            update_interval = timedelta(seconds = gsm_scan_interval),
             entry = entry,
             client = client,
         ),

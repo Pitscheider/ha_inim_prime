@@ -4,35 +4,35 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .entities.panel import create_panel_device_info
-
+from inim_prime_api import InimPrimeClient
 from .const import (
-    CONF_HOST,
-    CONF_API_KEY,
-    CONF_USE_HTTPS,
     CONF_SERIAL_NUMBER,
     DOMAIN,
     PANEL_LOG_EVENTS_COORDINATOR,
-    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
-    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
-    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
-    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
     CONF_MAIN_SCAN_INTERVAL,
     CONF_MAIN_SCAN_INTERVAL_DEFAULT,
-    CONF_SCAN_INTERVAL_MIN,
-    CONF_SCAN_INTERVAL_MAX,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
 )
-
 from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
-from inim_prime_api import InimPrimeClient
+from .entities.panel import create_panel_device_info
+
+PLATFORMS = [
+    "binary_sensor",
+    "sensor",
+    "switch",
+    "select",
+    "button",
+    "event",
+]
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Set up INIM Prime integration."""
     hass.data.setdefault(DOMAIN, {})
+
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
     create_panel_device_info(entry)
 
@@ -60,9 +60,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         client = client,
     )
 
-    await panel_log_events_coordinator.async_startup()
-    await panel_log_events_coordinator.async_config_entry_first_refresh()
     await main_coordinator.async_config_entry_first_refresh()
+
+    await panel_log_events_coordinator.async_startup()
+
+    await panel_log_events_coordinator.async_config_entry_first_refresh()
+
 
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
@@ -72,17 +75,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     await hass.config_entries.async_forward_entry_setups(
         entry = entry,
-        platforms = [
-            "binary_sensor",
-            "sensor",
-            "switch",
-            "select",
-            "button",
-            "event",
-        ]
+        platforms = PLATFORMS,
     )
 
-    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
+
 
     return True
 
@@ -103,12 +99,29 @@ async def async_remove_config_entry_device(
 
 async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Reload INIM Prime config entry."""
-    await async_unload_entry(hass, entry)
-    await async_setup_entry(hass, entry)
+    await hass.config_entries.async_reload(entry.entry_id)
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     """Unload INIM Prime integration."""
-    data = hass.data[DOMAIN].pop(entry.entry_id)
-    await data["client"].close()
-    return True
+    unload_ok = await hass.config_entries.async_unload_platforms(
+        entry = entry,
+        platforms = PLATFORMS,
+    )
+
+    if unload_ok:
+        data = hass.data[DOMAIN].pop(entry.entry_id)
+
+        # Stop coordinators (optional but recommended)
+        coordinator = data.get("coordinator")
+        if coordinator and hasattr(coordinator, "async_shutdown"):
+            coordinator.async_shutdown()
+
+        panel_logs_coordinator = data.get(PANEL_LOG_EVENTS_COORDINATOR)
+        if panel_logs_coordinator and hasattr(panel_logs_coordinator, "async_shutdown"):
+            panel_logs_coordinator.async_shutdown()
+
+        # Close API client
+        await data["client"].close()
+
+    return unload_ok

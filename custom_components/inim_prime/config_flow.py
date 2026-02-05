@@ -6,6 +6,8 @@ from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.core import callback
 from homeassistant.helpers.selector import TextSelector, TextSelectorType, TextSelectorConfig
 
+from const import CONF_MAIN_SCAN_INTERVAL, CONF_MAIN_SCAN_INTERVAL_DEFAULT, CONF_SCAN_INTERVAL_MIN, \
+    CONF_SCAN_INTERVAL_MAX, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT
 from .const import (
     CONF_HOST,
     CONF_API_KEY,
@@ -50,17 +52,44 @@ def build_connection_schema(
 def build_optional_schema(
         *,
         default_panel_log_events_fetch_limit: int | None = None,
+        default_main_scan_interval: int | None = None,
+        default_panel_log_events_scan_interval: int | None = None,
 ) -> dict:
     """Build the connection schema with optional defaults."""
     schema: dict = {
+        # Panel Log Events Fetch Limit
         vol.Required(
-            CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+            schema = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
             default = default_panel_log_events_fetch_limit or CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
         ): vol.All(
             int,
             vol.Range(
                 min = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
                 max = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+            ),
+        ),
+
+        # Main Scan Interval
+        vol.Required(
+            schema = CONF_MAIN_SCAN_INTERVAL,
+            default = default_main_scan_interval or CONF_MAIN_SCAN_INTERVAL_DEFAULT,
+        ): vol.All(
+            int,
+            vol.Range(
+                min = CONF_SCAN_INTERVAL_MIN,
+                max = CONF_SCAN_INTERVAL_MAX,
+            ),
+        ),
+
+        # Panel Log Events Scan Interval
+        vol.Required(
+            CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+            default = default_panel_log_events_scan_interval or CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
+        ): vol.All(
+            int,
+            vol.Range(
+                min = CONF_SCAN_INTERVAL_MIN,
+                max = CONF_SCAN_INTERVAL_MAX,
             ),
         ),
     }
@@ -82,7 +111,18 @@ class InimPrimeOptionsFlowHandler(OptionsFlow):
         schema = vol.Schema(
             {
                 **build_optional_schema(
-                    default_panel_log_events_fetch_limit = self.config_entry.options[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT],
+                    default_panel_log_events_fetch_limit = self.config_entry.options.get(
+                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+                        None,
+                    ),
+                    default_main_scan_interval = self.config_entry.options.get(
+                        CONF_MAIN_SCAN_INTERVAL,
+                        None,
+                    ),
+                    default_panel_log_events_scan_interval = self.config_entry.options.get(
+                        CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+                        None,
+                    ),
                 ),
             }
         )
@@ -109,6 +149,8 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
             conf_use_https: bool = user_input.get(CONF_USE_HTTPS, True)
             conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
             conf_panel_log_events_fetch_limit: int = user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT]
+            conf_main_scan_interval: int = user_input[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
+            conf_panel_log_events_scan_interval: int = user_input[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
 
             await self.async_set_unique_id(conf_serial_number)
             self._abort_if_unique_id_configured()
@@ -134,6 +176,8 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
                     },
                     options = {
                         CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: conf_panel_log_events_fetch_limit,
+                        CONF_MAIN_SCAN_INTERVAL: conf_main_scan_interval,
+                        CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL: conf_panel_log_events_scan_interval,
                     },
                 )
 

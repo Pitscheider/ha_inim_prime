@@ -4,8 +4,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
+from const import CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL
 from .entities.panel import create_panel_device_info
-from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR, CONF_SERIAL_NUMBER
+from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR, CONF_SERIAL_NUMBER, CONF_MAIN_SCAN_INTERVAL_DEFAULT, CONF_MAIN_SCAN_INTERVAL
 from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 from inim_prime_api import InimPrimeClient
@@ -24,16 +25,19 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     client = InimPrimeClient(host = host, api_key = api_key, use_https = use_https)
     await client.connect()
 
+    main_scan_interval = entry.options.get(CONF_MAIN_SCAN_INTERVAL, CONF_MAIN_SCAN_INTERVAL_DEFAULT)
+    panel_log_events_scan_interval = entry.options.get(CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT)
+
     main_coordinator = InimPrimeDataUpdateCoordinator(
         hass = hass,
-        update_interval = timedelta(seconds = 10),
+        update_interval = timedelta(seconds = main_scan_interval),
         entry = entry,
         client = client,
     )
 
     panel_log_events_coordinator = InimPrimePanelLogEventsCoordinator(
         hass = hass,
-        update_interval = timedelta(seconds = 20),
+        update_interval = timedelta(seconds = panel_log_events_scan_interval),
         entry = entry,
         client = client,
     )
@@ -59,6 +63,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             "event",
         ]
     )
+
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
     return True
 

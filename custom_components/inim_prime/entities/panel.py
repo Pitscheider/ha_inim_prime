@@ -10,8 +10,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from ..const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
-from ..coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from ..coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
+from ..coordinators import InimPrimePanelLogEventsCoordinator, InimPrimeSystemFaultsUpdateCoordinator, InimPrimeZonesUpdateCoordinator, InimPrimePartitionsUpdateCoordinator
 from inim_prime_api.helpers.partitions import clear_all_partitions_alarm_memory
 from inim_prime_api.helpers.zones import include_all_zones
 from inim_prime_api.models.log_event import LogEvent
@@ -67,7 +66,7 @@ SYSTEM_FAULT_ICONS: dict[SystemFault, str] = {
 
 
 class SystemFaultBinarySensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeSystemFaultsUpdateCoordinator],
     BinarySensorEntity,
 ):
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
@@ -75,7 +74,7 @@ class SystemFaultBinarySensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeSystemFaultsUpdateCoordinator,
             entry: ConfigEntry,
             fault: SystemFault,
     ):
@@ -99,12 +98,12 @@ class SystemFaultBinarySensor(
 
     @property
     def is_on(self) -> bool:
-        system_faults = self.coordinator.data.system_faults
+        system_faults = self.coordinator.data
         return system_faults.has_fault(self._fault)
 
 
 class PanelSupplyVoltageSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeSystemFaultsUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "Supply Voltage"
@@ -115,7 +114,7 @@ class PanelSupplyVoltageSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeSystemFaultsUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -125,7 +124,7 @@ class PanelSupplyVoltageSensor(
     @property
     def native_value(self) -> float | None:
         """Return the supply voltage."""
-        system_faults = self.coordinator.data.system_faults
+        system_faults = self.coordinator.data
         return system_faults.supply_voltage
 
 
@@ -163,14 +162,14 @@ class PanelLogEventsEvent(
 
 
 class ExcludedZonesCountSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "Excluded Zones"
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeZonesUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -179,13 +178,13 @@ class ExcludedZonesCountSensor(
 
     @property
     def native_value(self) -> int | None:
-        if self.coordinator.data.zones:
-            return sum(zone.excluded for zone in self.coordinator.data.zones.values())
+        if self.coordinator.data:
+            return sum(zone.excluded for zone in self.coordinator.data.values())
         return None
 
 
 class IncludeAllZonesButton(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     ButtonEntity,
 ):
     _attr_name = "Include All Zones"
@@ -194,7 +193,7 @@ class IncludeAllZonesButton(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeZonesUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -207,7 +206,7 @@ class IncludeAllZonesButton(
 
     async def async_press(self) -> None:
         await include_all_zones(
-            zones = self.coordinator.data.zones,
+            zones = self.coordinator.data,
             client = self.coordinator.client,
         )
 
@@ -215,7 +214,7 @@ class IncludeAllZonesButton(
 
 
 class ClearAllPartitionsAlarmMemoryButton(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimePartitionsUpdateCoordinator],
     ButtonEntity,
 ):
     _attr_name = "Clear All Alarm Memories"
@@ -224,7 +223,7 @@ class ClearAllPartitionsAlarmMemoryButton(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimePartitionsUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -237,7 +236,7 @@ class ClearAllPartitionsAlarmMemoryButton(
 
     async def async_press(self) -> None:
         await clear_all_partitions_alarm_memory(
-            partitions = self.coordinator.data.partitions,
+            partitions = self.coordinator.data,
             client = self.coordinator.client,
         )
 

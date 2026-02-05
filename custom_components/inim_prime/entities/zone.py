@@ -6,7 +6,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from ..coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from ..coordinators import InimPrimeZonesUpdateCoordinator
 from ..const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
 from inim_prime_api.models.zone import ZoneState, ZoneStatus, ZoneExclusionSetRequest
 
@@ -27,14 +27,14 @@ def create_zone_device_info(
 
 
 class ZoneStateBinarySensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     BinarySensorEntity,
 ):
     _attr_name = None
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeZonesUpdateCoordinator,
             entry: ConfigEntry,
             zone: ZoneStatus,
     ):
@@ -51,7 +51,7 @@ class ZoneStateBinarySensor(
 
     @property
     def is_on(self) -> bool | None:
-        zone = self.coordinator.data.zones.get(self.zone_id)
+        zone = self.coordinator.data.get(self.zone_id)
 
         if zone:
             if zone.state == ZoneState.ALARM:
@@ -62,7 +62,7 @@ class ZoneStateBinarySensor(
 
 
 class ZoneStateSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "State"
@@ -72,7 +72,7 @@ class ZoneStateSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeZonesUpdateCoordinator,
             entry: ConfigEntry,
             zone: ZoneStatus,
     ):
@@ -89,14 +89,14 @@ class ZoneStateSensor(
 
     @property
     def native_value(self) -> str | None:
-        zone = self.coordinator.data.zones.get(self.zone_id)
+        zone = self.coordinator.data.get(self.zone_id)
         if zone:
             return zone.state.name
         return None
 
 
 class ZoneAlarmMemoryBinarySensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     BinarySensorEntity,
 ):
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
@@ -106,7 +106,7 @@ class ZoneAlarmMemoryBinarySensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeZonesUpdateCoordinator,
             entry: ConfigEntry,
             zone: ZoneStatus,
     ):
@@ -123,14 +123,14 @@ class ZoneAlarmMemoryBinarySensor(
 
     @property
     def is_on(self) -> bool | None:
-        zone = self.coordinator.data.zones.get(self.zone_id)
+        zone = self.coordinator.data.get(self.zone_id)
         if zone:
             return zone.alarm_memory
         return None
 
 
 class ZoneExclusionSwitch(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     SwitchEntity,
 ):
     _attr_name = "Exclusion"
@@ -139,7 +139,7 @@ class ZoneExclusionSwitch(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeZonesUpdateCoordinator,
             entry: ConfigEntry,
             zone: ZoneStatus,
     ):
@@ -157,7 +157,7 @@ class ZoneExclusionSwitch(
     @property
     def is_on(self) -> bool | None:
         """Return True if zone is excluded (switch ON = excluded)."""
-        zone = self.coordinator.data.zones.get(self.zone_id)
+        zone = self.coordinator.data.get(self.zone_id)
         if zone:
             return zone.excluded
         return None

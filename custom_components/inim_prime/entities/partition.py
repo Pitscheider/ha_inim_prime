@@ -7,7 +7,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from ..coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from ..coordinators import InimPrimePartitionsUpdateCoordinator
 from ..const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
 from inim_prime_api.models.partition import (
     SetPartitionModeRequest,
@@ -34,7 +34,7 @@ def create_partition_device_info(
 
 
 class PartitionStateSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimePartitionsUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "State"
@@ -44,7 +44,7 @@ class PartitionStateSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimePartitionsUpdateCoordinator,
             entry: ConfigEntry,
             partition: PartitionStatus,
     ):
@@ -61,14 +61,14 @@ class PartitionStateSensor(
 
     @property
     def native_value(self) -> str | None:
-        partition = self.coordinator.data.partitions.get(self.partition_id)
+        partition = self.coordinator.data.get(self.partition_id)
         if partition:
             return partition.state.name
         return None
 
 
 class PartitionModeSelect(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimePartitionsUpdateCoordinator],
     SelectEntity,
 ):
     _attr_name = "Mode"
@@ -77,7 +77,7 @@ class PartitionModeSelect(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimePartitionsUpdateCoordinator,
             entry: ConfigEntry,
             partition: PartitionStatus
     ):
@@ -95,7 +95,7 @@ class PartitionModeSelect(
     @property
     def current_option(self) -> str | None:
         """Return the current partition mode."""
-        partition = self.coordinator.data.partitions.get(self.partition_id)
+        partition = self.coordinator.data.get(self.partition_id)
         if partition:
             return partition.mode.name
         return None
@@ -114,7 +114,7 @@ class PartitionModeSelect(
 
 
 class ClearPartitionAlarmMemoryButton(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimePartitionsUpdateCoordinator],
     ButtonEntity,
 ):
     _attr_name = "Clear Alarm Memory"
@@ -122,7 +122,7 @@ class ClearPartitionAlarmMemoryButton(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimePartitionsUpdateCoordinator,
             entry: ConfigEntry,
             partition: PartitionStatus,
     ):
@@ -147,7 +147,7 @@ class ClearPartitionAlarmMemoryButton(
 
 
 class PartitionAlarmMemoryBinarySensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimePartitionsUpdateCoordinator],
     BinarySensorEntity,
 ):
     _attr_device_class = BinarySensorDeviceClass.PROBLEM
@@ -157,7 +157,7 @@ class PartitionAlarmMemoryBinarySensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimePartitionsUpdateCoordinator,
             entry: ConfigEntry,
             partition: PartitionStatus
     ):
@@ -174,7 +174,7 @@ class PartitionAlarmMemoryBinarySensor(
 
     @property
     def is_on(self) -> bool | None:
-        partition = self.coordinator.data.partitions.get(self.partition_id)
+        partition = self.coordinator.data.get(self.partition_id)
         if partition:
             return partition.alarm_memory
         return None

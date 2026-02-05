@@ -4,11 +4,20 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
+from const import PARTITIONS_COORDINATOR, GSM_COORDINATOR, SYSTEM_FAULTS_COORDINATOR
+from coordinators.gsm_coordinator import InimPrimeGSMUpdateCoordinator
+from coordinators.partitions_coordinator import InimPrimePartitionsUpdateCoordinator
+from coordinators.system_faults_coordinator import InimPrimeSystemFaultsUpdateCoordinator
+from coordinators.zones_coordinator import InimPrimeZonesUpdateCoordinator
 from inim_prime_api import InimPrimeClient
 from .const import (
     CONF_SERIAL_NUMBER,
     DOMAIN,
     PANEL_LOG_EVENTS_COORDINATOR,
+    ZONES_COORDINATOR,
+    PARTITIONS_COORDINATOR,
+    GSM_COORDINATOR,
+    SYSTEM_FAULTS_COORDINATOR,
     CONF_MAIN_SCAN_INTERVAL,
     CONF_MAIN_SCAN_INTERVAL_DEFAULT,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
@@ -43,42 +52,63 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     client = InimPrimeClient(host = host, api_key = api_key, use_https = use_https)
     await client.connect()
 
+    ###
+    ### Coordinators
+    ###
     main_scan_interval = entry.options.get(CONF_MAIN_SCAN_INTERVAL, CONF_MAIN_SCAN_INTERVAL_DEFAULT)
     panel_log_events_scan_interval = entry.options.get(CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT)
 
-    main_coordinator = InimPrimeDataUpdateCoordinator(
-        hass = hass,
-        update_interval = timedelta(seconds = main_scan_interval),
-        entry = entry,
-        client = client,
-    )
+    coordinators = {
+        ZONES_COORDINATOR: InimPrimeZonesUpdateCoordinator(
+            hass = hass,
+            update_interval = timedelta(seconds = main_scan_interval),
+            entry = entry,
+            client = client,
+        ),
+        PARTITIONS_COORDINATOR: InimPrimePartitionsUpdateCoordinator(
+            hass = hass,
+            update_interval = timedelta(seconds = main_scan_interval),
+            entry = entry,
+            client = client,
+        ),
+        SYSTEM_FAULTS_COORDINATOR: InimPrimeSystemFaultsUpdateCoordinator(
+            hass = hass,
+            update_interval = timedelta(seconds = main_scan_interval),
+            entry = entry,
+            client = client,
+        ),
+        GSM_COORDINATOR: InimPrimeGSMUpdateCoordinator(
+            hass = hass,
+            update_interval = timedelta(seconds = main_scan_interval),
+            entry = entry,
+            client = client,
+        ),
+        PANEL_LOG_EVENTS_COORDINATOR: InimPrimePanelLogEventsCoordinator(
+            hass = hass,
+            update_interval = timedelta(seconds = panel_log_events_scan_interval),
+            entry = entry,
+            client = client,
+        ),
+    }
 
-    panel_log_events_coordinator = InimPrimePanelLogEventsCoordinator(
-        hass = hass,
-        update_interval = timedelta(seconds = panel_log_events_scan_interval),
-        entry = entry,
-        client = client,
-    )
+    await coordinators[ZONES_COORDINATOR].async_config_entry_first_refresh()
+    await coordinators[PARTITIONS_COORDINATOR].async_config_entry_first_refresh()
+    await coordinators[SYSTEM_FAULTS_COORDINATOR].async_config_entry_first_refresh()
+    await coordinators[GSM_COORDINATOR].async_config_entry_first_refresh()
 
-    await main_coordinator.async_config_entry_first_refresh()
-
-    await panel_log_events_coordinator.async_startup()
-
-    await panel_log_events_coordinator.async_config_entry_first_refresh()
+    await coordinators[PANEL_LOG_EVENTS_COORDINATOR].async_startup()
+    await coordinators[PANEL_LOG_EVENTS_COORDINATOR].async_config_entry_first_refresh()
 
 
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
-        "coordinator": main_coordinator,
-        PANEL_LOG_EVENTS_COORDINATOR: panel_log_events_coordinator,
+        "coordinators": coordinators,
     }
 
     await hass.config_entries.async_forward_entry_setups(
         entry = entry,
         platforms = PLATFORMS,
     )
-
-
 
     return True
 
@@ -113,13 +143,11 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         data = hass.data[DOMAIN].pop(entry.entry_id)
 
         # Stop coordinators (optional but recommended)
-        coordinator = data.get("coordinator")
-        if coordinator and hasattr(coordinator, "async_shutdown"):
-            coordinator.async_shutdown()
+        coordinators = data.get("coordinators", {})
 
-        panel_logs_coordinator = data.get(PANEL_LOG_EVENTS_COORDINATOR)
-        if panel_logs_coordinator and hasattr(panel_logs_coordinator, "async_shutdown"):
-            panel_logs_coordinator.async_shutdown()
+        for coordinator in coordinators.values():
+            if coordinator and hasattr(coordinator, "async_shutdown"):
+                coordinator.async_shutdown()
 
         # Close API client
         await data["client"].close()

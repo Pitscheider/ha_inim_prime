@@ -6,17 +6,36 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from .const import DOMAIN, CONF_SERIAL_NUMBER, PANEL_LOG_EVENTS_COORDINATOR
-from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
+from .const import (
+    DOMAIN,
+    CONF_SERIAL_NUMBER,
+    PANEL_LOG_EVENTS_COORDINATOR,
+    ZONES_COORDINATOR,
+    PARTITIONS_COORDINATOR,
+    SYSTEM_FAULTS_COORDINATOR,
+    GSM_COORDINATOR,
+)
 
+from .coordinators import (
+    InimPrimeZonesUpdateCoordinator,
+    InimPrimePartitionsUpdateCoordinator,
+    InimPrimeSystemFaultsUpdateCoordinator,
+    InimPrimeGSMUpdateCoordinator,
+    InimPrimePanelLogEventsCoordinator,
+)
 
 async def async_get_config_entry_diagnostics(
         hass: HomeAssistant,
         config_entry: ConfigEntry,
 ) -> dict[str, Any]:
     """Return diagnostics for the config entry."""
-    coordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
+    coordinators = hass.data[DOMAIN][config_entry.entry_id]["coordinators"]
+
+    zones_coordinator: InimPrimeZonesUpdateCoordinator = coordinators[ZONES_COORDINATOR]
+    partitions_coordinator: InimPrimePartitionsUpdateCoordinator = coordinators[PARTITIONS_COORDINATOR]
+    system_faults_coordinator: InimPrimeSystemFaultsUpdateCoordinator = coordinators[SYSTEM_FAULTS_COORDINATOR]
+    gsm_coordinator: InimPrimeGSMUpdateCoordinator = coordinators[GSM_COORDINATOR]
+    panel_log_events_coordinator: InimPrimePanelLogEventsCoordinator = coordinators[PANEL_LOG_EVENTS_COORDINATOR]
 
     return {
         "panel": {
@@ -32,7 +51,7 @@ async def async_get_config_entry_diagnostics(
                 "excluded": zone.excluded,
                 "alarm_memory": zone.alarm_memory,
             }
-            for zone_id, zone in coordinator.data.zones.items()
+            for zone_id, zone in zones_coordinator.data.items()
         },
         "partitions": {
             partition_id: {
@@ -42,18 +61,18 @@ async def async_get_config_entry_diagnostics(
                 "mode": partition.mode.name,
                 "alarm_memory": partition.alarm_memory,
             }
-            for partition_id, partition in coordinator.data.partitions.items()
+            for partition_id, partition in partitions_coordinator.data.items()
         },
         "system_faults": {
-            "supply_voltage": coordinator.data.system_faults.supply_voltage,
-            "faults": [fault.name for fault in coordinator.data.system_faults.faults],
+            "supply_voltage": system_faults_coordinator.data.supply_voltage,
+            "faults": [fault.name for fault in system_faults_coordinator.data.faults],
         },
         "gsm": {
-            "supply_voltage": coordinator.data.gsm.supply_voltage,
-            "firmware_version": coordinator.data.gsm.firmware_version,
-            "operator": coordinator.data.gsm.operator,
-            "signal_strength": coordinator.data.gsm.signal_strength,
-            "credit": coordinator.data.gsm.credit,
+            "supply_voltage": gsm_coordinator.data.supply_voltage,
+            "firmware_version": gsm_coordinator.data.firmware_version,
+            "operator": gsm_coordinator.data.operator,
+            "signal_strength": gsm_coordinator.data.signal_strength,
+            "credit": gsm_coordinator.data.credit,
         },
     }
 
@@ -65,8 +84,14 @@ async def async_get_device_diagnostics(
 ) -> dict[str, Any]:
     """Return diagnostics for a device."""
 
-    coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][config_entry.entry_id]["coordinator"]
-    panel_log_events_coordinator: InimPrimePanelLogEventsCoordinator = hass.data[DOMAIN][config_entry.entry_id][PANEL_LOG_EVENTS_COORDINATOR]
+    coordinators = hass.data[DOMAIN][config_entry.entry_id]["coordinators"]
+
+    zones_coordinator: InimPrimeZonesUpdateCoordinator = coordinators[ZONES_COORDINATOR]
+    partitions_coordinator: InimPrimePartitionsUpdateCoordinator = coordinators[PARTITIONS_COORDINATOR]
+    system_faults_coordinator: InimPrimeSystemFaultsUpdateCoordinator = coordinators[SYSTEM_FAULTS_COORDINATOR]
+    gsm_coordinator: InimPrimeGSMUpdateCoordinator = coordinators[GSM_COORDINATOR]
+    panel_log_events_coordinator: InimPrimePanelLogEventsCoordinator = coordinators[PANEL_LOG_EVENTS_COORDINATOR]
+
     # Extract the device type and ID from the device identifiers
     device_info = {}
     for domain, dev_id in device.identifiers:
@@ -81,7 +106,7 @@ async def async_get_device_diagnostics(
             if "_zone_" in dev_id:
                 # Zone device
                 zone_id = int(dev_id.split("_zone_")[1])
-                zone = coordinator.data.zones.get(zone_id)
+                zone = zones_coordinator.data.get(zone_id)
                 if zone:
                     device_info = {
                         "device_type": "zone",
@@ -96,7 +121,7 @@ async def async_get_device_diagnostics(
             elif "_partition_" in dev_id:
                 # Partition device
                 partition_id = int(dev_id.split("_partition_")[1])
-                partition = coordinator.data.partitions.get(partition_id)
+                partition = partitions_coordinator.data.get(partition_id)
                 if partition:
                     device_info = {
                         "device_type": "partition",
@@ -109,7 +134,7 @@ async def async_get_device_diagnostics(
 
             elif "_gsm" in dev_id:
                 # GSM device
-                gsm = coordinator.data.gsm
+                gsm = gsm_coordinator.data
                 device_info = {
                     "device_type": "gsm",
                     "supply_voltage": gsm.supply_voltage,
@@ -126,9 +151,9 @@ async def async_get_device_diagnostics(
                     "serial_number": config_entry.data[CONF_SERIAL_NUMBER],
                     "host": config_entry.data.get("host"),
                     "use_https": config_entry.data.get("use_https"),
-                    "supply_voltage": coordinator.data.system_faults.supply_voltage,
+                    "supply_voltage": system_faults_coordinator.data.supply_voltage,
                     "active_faults": [
-                        fault.name for fault in coordinator.data.system_faults.faults
+                        fault.name for fault in system_faults_coordinator.data.faults
                     ],
                     "log_events": panel_log_events_coordinator.last_panel_log_events,
                 }

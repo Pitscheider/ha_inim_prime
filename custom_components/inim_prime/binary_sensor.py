@@ -1,5 +1,5 @@
-from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from .const import DOMAIN
+from .coordinators import InimPrimeZonesUpdateCoordinator, InimPrimePartitionsUpdateCoordinator, InimPrimeSystemFaultsUpdateCoordinator
+from .const import DOMAIN, ZONES_COORDINATOR, PARTITIONS_COORDINATOR, SYSTEM_FAULTS_COORDINATOR
 from .entities.panel import SystemFaultBinarySensor
 from .entities.partition import PartitionAlarmMemoryBinarySensor
 from .entities.zone import ZoneStateBinarySensor, ZoneAlarmMemoryBinarySensor
@@ -8,23 +8,23 @@ from inim_prime_api.models.system_faults import EXPOSED_SYSTEM_FAULTS
 
 async def async_setup_entry(hass, entry, async_add_entities) -> None:
     """Set up INIM Prime binary sensors from a config entry."""
-    coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    coordinators = hass.data[DOMAIN][entry.entry_id]["coordinators"]
+    zones_coordinator: InimPrimeZonesUpdateCoordinator = coordinators[ZONES_COORDINATOR]
+    partitions_coordinator: InimPrimePartitionsUpdateCoordinator = coordinators[PARTITIONS_COORDINATOR]
+    system_faults_coordinator: InimPrimeSystemFaultsUpdateCoordinator = coordinators[SYSTEM_FAULTS_COORDINATOR]
 
     entities = []
 
-    zones = coordinator.data.zones
-    partitions = coordinator.data.partitions
+    for zone in zones_coordinator.data.values():
+        entities.append(ZoneStateBinarySensor(zones_coordinator, entry, zone))
+        entities.append(ZoneAlarmMemoryBinarySensor(zones_coordinator, entry, zone))
 
-    for zone in zones.values():
-        entities.append(ZoneStateBinarySensor(coordinator, entry, zone))
-        entities.append(ZoneAlarmMemoryBinarySensor(coordinator, entry, zone))
-
-    for partition in partitions.values():
-        entities.append(PartitionAlarmMemoryBinarySensor(coordinator, entry, partition))
+    for partition in partitions_coordinator.data.values():
+        entities.append(PartitionAlarmMemoryBinarySensor(partitions_coordinator, entry, partition))
 
     for exposedSystemFault in EXPOSED_SYSTEM_FAULTS:
         entities.append(
-            SystemFaultBinarySensor(coordinator, entry, exposedSystemFault)
+            SystemFaultBinarySensor(system_faults_coordinator, entry, exposedSystemFault)
         )
 
     async_add_entities(entities, update_before_add = True)

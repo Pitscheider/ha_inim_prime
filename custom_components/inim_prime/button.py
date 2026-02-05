@@ -1,18 +1,23 @@
-from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from .const import DOMAIN
+from .coordinators import InimPrimeZonesUpdateCoordinator, InimPrimePartitionsUpdateCoordinator
+from .const import DOMAIN, ZONES_COORDINATOR, PARTITIONS_COORDINATOR
 from .entities.panel import IncludeAllZonesButton, ClearAllPartitionsAlarmMemoryButton
 from .entities.partition import ClearPartitionAlarmMemoryButton
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    partitions = coordinator.data.partitions
+    coordinators = hass.data[DOMAIN][entry.entry_id]["coordinators"]
+
+    partitions_coordinator: InimPrimePartitionsUpdateCoordinator = coordinators[PARTITIONS_COORDINATOR]
+    zones_coordinator: InimPrimeZonesUpdateCoordinator = coordinators[ZONES_COORDINATOR]
+
     entities = []
 
-    for partition in partitions.values():
-        entities.append(ClearPartitionAlarmMemoryButton(coordinator, entry, partition))
+    for partition in partitions_coordinator.data.values():
+        entities.append(ClearPartitionAlarmMemoryButton(partitions_coordinator, entry, partition))
 
-    entities.append(IncludeAllZonesButton(coordinator, entry))
-    entities.append(ClearAllPartitionsAlarmMemoryButton(coordinator, entry))
+    entities.append(IncludeAllZonesButton(zones_coordinator, entry))
+    entities.append(ClearAllPartitionsAlarmMemoryButton(partitions_coordinator, entry))
 
     async_add_entities(entities, update_before_add = True)
+
+    async_add_entities(entities, update_before_add=True)

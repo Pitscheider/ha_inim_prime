@@ -4,7 +4,7 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from ..coordinators.coordinator import InimPrimeDataUpdateCoordinator
+from ..coordinators import InimPrimeGSMUpdateCoordinator
 from ..const import DOMAIN, INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER
 
 
@@ -24,7 +24,7 @@ def create_gsm_device_info(
 
 
 class GSMSupplyVoltageSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeGSMUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "Supply Voltage"
@@ -35,7 +35,7 @@ class GSMSupplyVoltageSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeGSMUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -44,17 +44,17 @@ class GSMSupplyVoltageSensor(
 
         self._attr_device_info = create_gsm_device_info(
             entry = entry,
-            sw_version = self.coordinator.data.gsm.firmware_version,
+            sw_version = self.coordinator.data.firmware_version,
         )
 
     @property
     def native_value(self) -> float | None:
-        gsm = self.coordinator.data.gsm
+        gsm = self.coordinator.data
         return gsm.supply_voltage
 
 
 class GSMOperatorSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeGSMUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "Operator"
@@ -63,7 +63,7 @@ class GSMOperatorSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeGSMUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -72,17 +72,17 @@ class GSMOperatorSensor(
 
         self._attr_device_info = create_gsm_device_info(
             entry = entry,
-            sw_version = self.coordinator.data.gsm.firmware_version
+            sw_version = self.coordinator.data.firmware_version
         )
 
     @property
     def native_value(self) -> str | None:
-        gsm = self.coordinator.data.gsm
+        gsm = self.coordinator.data
         return gsm.operator
 
 
 class GSMSignalStrengthSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeGSMUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "Signal Strength"
@@ -93,7 +93,7 @@ class GSMSignalStrengthSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeGSMUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -102,17 +102,17 @@ class GSMSignalStrengthSensor(
 
         self._attr_device_info = create_gsm_device_info(
             entry = entry,
-            sw_version = self.coordinator.data.gsm.firmware_version,
+            sw_version = self.coordinator.data.firmware_version,
         )
 
     @property
     def native_value(self) -> float | None:
-        gsm = self.coordinator.data.gsm
+        gsm = self.coordinator.data
         return gsm.signal_strength
 
 
 class GSMCreditSensor(
-    CoordinatorEntity[InimPrimeDataUpdateCoordinator],
+    CoordinatorEntity[InimPrimeGSMUpdateCoordinator],
     SensorEntity,
 ):
     _attr_name = "Credit"
@@ -121,7 +121,7 @@ class GSMCreditSensor(
 
     def __init__(
             self,
-            coordinator: InimPrimeDataUpdateCoordinator,
+            coordinator: InimPrimeGSMUpdateCoordinator,
             entry: ConfigEntry,
     ):
         super().__init__(coordinator)
@@ -130,10 +130,10 @@ class GSMCreditSensor(
 
         self._attr_device_info = create_gsm_device_info(
             entry = entry,
-            sw_version = self.coordinator.data.gsm.firmware_version,
+            sw_version = self.coordinator.data.firmware_version,
         )
 
     @property
     def native_value(self) -> str | None:
-        gsm = self.coordinator.data.gsm
+        gsm = self.coordinator.data
         return gsm.credit

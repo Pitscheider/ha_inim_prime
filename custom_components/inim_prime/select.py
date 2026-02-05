@@ -1,14 +1,16 @@
-from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from .const import DOMAIN
+from .coordinators import InimPrimePartitionsUpdateCoordinator
+from .const import DOMAIN, PARTITIONS_COORDINATOR
 from .entities.partition import PartitionModeSelect
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    partitions = coordinator.data.partitions
+    coordinators = hass.data[DOMAIN][entry.entry_id]["coordinators"]
+
+    partitions_coordinator: InimPrimePartitionsUpdateCoordinator = coordinators[PARTITIONS_COORDINATOR]
+
     entities = []
 
-    for partition in partitions.values():
-        entities.append(PartitionModeSelect(coordinator, entry, partition))
+    for partition in partitions_coordinator.data.values():
+        entities.append(PartitionModeSelect(partitions_coordinator, entry, partition))
 
     async_add_entities(entities, update_before_add = True)

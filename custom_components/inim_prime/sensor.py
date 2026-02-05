@@ -1,5 +1,10 @@
-from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
-from .const import DOMAIN
+from .coordinators import (
+    InimPrimeZonesUpdateCoordinator,
+    InimPrimePartitionsUpdateCoordinator,
+    InimPrimeGSMUpdateCoordinator,
+    InimPrimeSystemFaultsUpdateCoordinator,
+)
+from .const import DOMAIN, ZONES_COORDINATOR, PARTITIONS_COORDINATOR, GSM_COORDINATOR, SYSTEM_FAULTS_COORDINATOR
 from .entities.gsm import GSMSupplyVoltageSensor, GSMOperatorSensor, GSMSignalStrengthSensor, GSMCreditSensor
 from .entities.panel import PanelSupplyVoltageSensor, ExcludedZonesCountSensor
 from .entities.partition import PartitionStateSensor
@@ -7,22 +12,31 @@ from .entities.zone import ZoneStateSensor
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator: InimPrimeDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
-    zones = coordinator.data.zones
-    partitions = coordinator.data.partitions
+    coordinators = hass.data[DOMAIN][entry.entry_id]["coordinators"]
+
+    zones_coordinator: InimPrimeZonesUpdateCoordinator = coordinators[ZONES_COORDINATOR]
+    partitions_coordinator: InimPrimePartitionsUpdateCoordinator = coordinators[PARTITIONS_COORDINATOR]
+    gsm_coordinator: InimPrimeGSMUpdateCoordinator = coordinators[GSM_COORDINATOR]
+    system_faults_coordinator: InimPrimeSystemFaultsUpdateCoordinator = coordinators[SYSTEM_FAULTS_COORDINATOR]
+
     entities = []
 
-    for zone in zones.values():
-        entities.append(ZoneStateSensor(coordinator, entry, zone))
+    # Zone sensors
+    for zone in zones_coordinator.data.values():
+        entities.append(ZoneStateSensor(zones_coordinator, entry, zone))
 
-    for partition in partitions.values():
-        entities.append(PartitionStateSensor(coordinator, entry, partition))
+    # Partition sensors
+    for partition in partitions_coordinator.data.values():
+        entities.append(PartitionStateSensor(partitions_coordinator, entry, partition))
 
-    entities.append(PanelSupplyVoltageSensor(coordinator, entry))
-    entities.append(GSMSupplyVoltageSensor(coordinator, entry))
-    entities.append(GSMOperatorSensor(coordinator, entry))
-    entities.append(GSMSignalStrengthSensor(coordinator, entry))
-    entities.append(GSMCreditSensor(coordinator, entry))
-    entities.append(ExcludedZonesCountSensor(coordinator, entry))
+    # Panel sensors
+    entities.append(PanelSupplyVoltageSensor(system_faults_coordinator, entry))
+    entities.append(ExcludedZonesCountSensor(zones_coordinator, entry))
+
+    # GSM sensors
+    entities.append(GSMSupplyVoltageSensor(gsm_coordinator, entry))
+    entities.append(GSMOperatorSensor(gsm_coordinator, entry))
+    entities.append(GSMSignalStrengthSensor(gsm_coordinator, entry))
+    entities.append(GSMCreditSensor(gsm_coordinator, entry))
 
     async_add_entities(entities, update_before_add = True)

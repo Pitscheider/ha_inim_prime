@@ -48,6 +48,7 @@ class InimPrimeDataUpdateCoordinator(DataUpdateCoordinator[CoordinatorData]):
     ):
         super().__init__(
             hass = hass,
+            config_entry = entry,
             logger = _LOGGER,
             name = "INIM Prime",
             update_interval = update_interval,

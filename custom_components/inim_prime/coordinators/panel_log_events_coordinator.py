@@ -42,6 +42,7 @@ class InimPrimePanelLogEventsCoordinator(DataUpdateCoordinator[List[LogEvent]]):
     ):
         super().__init__(
             hass = hass,
+            config_entry = entry,
             logger = _LOGGER,
             name = "INIM Prime Panel Logs",
             update_interval = update_interval,

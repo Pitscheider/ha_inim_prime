@@ -4,6 +4,7 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.core import callback
+from homeassistant.data_entry_flow import section, SectionConfig
 from homeassistant.helpers.selector import TextSelector, TextSelectorType, TextSelectorConfig
 
 from .const import (
@@ -89,52 +90,57 @@ def build_optional_schema(
                 max = CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
             ),
         ),
+        vol.Required("scan_intervals"): section(
+            vol.Schema(
+                {
+                    # Zones Scan Interval
+                    vol.Required(
+                        CONF_ZONES_SCAN_INTERVAL,
+                        default = default_zones_scan_interval or CONF_ZONES_SCAN_INTERVAL_DEFAULT,
+                    ): vol.All(
+                        int,
+                        vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+                    ),
 
-        # Zones Scan Interval
-        vol.Required(
-            CONF_ZONES_SCAN_INTERVAL,
-            default = default_zones_scan_interval or CONF_ZONES_SCAN_INTERVAL_DEFAULT,
-        ): vol.All(
-            int,
-            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
-        ),
+                    # Partitions Scan Interval
+                    vol.Required(
+                        CONF_PARTITIONS_SCAN_INTERVAL,
+                        default = default_partitions_scan_interval or CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
+                    ): vol.All(
+                        int,
+                        vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+                    ),
 
-        # Partitions Scan Interval
-        vol.Required(
-            CONF_PARTITIONS_SCAN_INTERVAL,
-            default = default_partitions_scan_interval or CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
-        ): vol.All(
-            int,
-            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
-        ),
+                    # GSM Scan Interval
+                    vol.Required(
+                        CONF_GSM_SCAN_INTERVAL,
+                        default = default_gsm_scan_interval or CONF_GSM_SCAN_INTERVAL_DEFAULT,
+                    ): vol.All(
+                        int,
+                        vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+                    ),
 
-        # GSM Scan Interval
-        vol.Required(
-            CONF_GSM_SCAN_INTERVAL,
-            default = default_gsm_scan_interval or CONF_GSM_SCAN_INTERVAL_DEFAULT,
-        ): vol.All(
-            int,
-            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
-        ),
+                    # System Faults Scan Interval
+                    vol.Required(
+                        CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
+                        default = default_system_faults_scan_interval or CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
+                    ): vol.All(
+                        int,
+                        vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
+                    ),
 
-        # System Faults Scan Interval
-        vol.Required(
-            CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
-            default = default_system_faults_scan_interval or CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
-        ): vol.All(
-            int,
-            vol.Range(min = CONF_SCAN_INTERVAL_MIN, max = CONF_SCAN_INTERVAL_MAX),
-        ),
-
-        # Panel Log Events Scan Interval
-        vol.Required(
-            CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
-            default = default_panel_log_events_scan_interval or CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
-        ): vol.All(
-            int,
-            vol.Range(
-                min = CONF_SCAN_INTERVAL_MIN,
-                max = CONF_SCAN_INTERVAL_MAX,
+                    # Panel Log Events Scan Interval
+                    vol.Required(
+                        CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+                        default = default_panel_log_events_scan_interval or CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
+                    ): vol.All(
+                        int,
+                        vol.Range(
+                            min = CONF_SCAN_INTERVAL_MIN,
+                            max = CONF_SCAN_INTERVAL_MAX,
+                        ),
+                    ),
+                }
             ),
         ),
     }

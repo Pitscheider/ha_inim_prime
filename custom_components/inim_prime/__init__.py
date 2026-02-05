@@ -4,7 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from coordinators import (
+from .coordinators import (
     InimPrimeGSMUpdateCoordinator,
     InimPrimePartitionsUpdateCoordinator,
     InimPrimeZonesUpdateCoordinator,

@@ -4,9 +4,27 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
 
-from const import CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT, CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL
 from .entities.panel import create_panel_device_info
-from .const import DOMAIN, PANEL_LOG_EVENTS_COORDINATOR, CONF_SERIAL_NUMBER, CONF_MAIN_SCAN_INTERVAL_DEFAULT, CONF_MAIN_SCAN_INTERVAL
+
+from .const import (
+    CONF_HOST,
+    CONF_API_KEY,
+    CONF_USE_HTTPS,
+    CONF_SERIAL_NUMBER,
+    DOMAIN,
+    PANEL_LOG_EVENTS_COORDINATOR,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_DEFAULT,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MIN,
+    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT_MAX,
+    CONF_MAIN_SCAN_INTERVAL,
+    CONF_MAIN_SCAN_INTERVAL_DEFAULT,
+    CONF_SCAN_INTERVAL_MIN,
+    CONF_SCAN_INTERVAL_MAX,
+    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
+)
+
 from .coordinators.coordinator import InimPrimeDataUpdateCoordinator
 from .coordinators.panel_log_events_coordinator import InimPrimePanelLogEventsCoordinator
 from inim_prime_api import InimPrimeClient

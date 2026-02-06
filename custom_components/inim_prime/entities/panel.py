@@ -242,11 +242,10 @@ class ClearAllPartitionsAlarmMemoryButton(
 
         await self.coordinator.async_request_refresh()
 
-class ZonesAlarmMemoryBinarySensor(
+class ZonesAlarmMemoryCountSensor(
     CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
-    BinarySensorEntity,
+    SensorEntity,
 ):
-    _attr_device_class = BinarySensorDeviceClass.PROBLEM
     _attr_name = "Zones Alarm Memory"
     _attr_icon = "mdi:alarm-light"
 
@@ -257,15 +256,11 @@ class ZonesAlarmMemoryBinarySensor(
     ):
         super().__init__(coordinator)
 
-
-        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_zones_alarm_memory"
-
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_zones_alarm_memory_count"
         self._attr_device_info = create_panel_device_info(entry)
 
     @property
-    def is_on(self) -> bool | None:
-        """Return True if any zone has alarm memory."""
-        if not self.coordinator.data:
-            return None
-        return any(zone.alarm_memory for zone in self.coordinator.data.values())
-
+    def native_value(self) -> int | None:
+        if self.coordinator.data:
+            return sum(zone.alarm_memory for zone in self.coordinator.data.values())
+        return None

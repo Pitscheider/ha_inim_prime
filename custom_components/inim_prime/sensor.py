@@ -6,7 +6,7 @@ from .coordinators import (
 )
 from .const import DOMAIN, ZONES_COORDINATOR, PARTITIONS_COORDINATOR, GSM_COORDINATOR, SYSTEM_FAULTS_COORDINATOR
 from .entities.gsm import GSMSupplyVoltageSensor, GSMOperatorSensor, GSMSignalStrengthSensor, GSMCreditSensor
-from .entities.panel import PanelSupplyVoltageSensor, ExcludedZonesCountSensor
+from .entities.panel import PanelSupplyVoltageSensor, ExcludedZonesCountSensor, ZonesAlarmMemoryCountSensor
 from .entities.partition import PartitionStateSensor
 from .entities.zone import ZoneStateSensor
 
@@ -32,6 +32,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
     # Panel sensors
     entities.append(PanelSupplyVoltageSensor(system_faults_coordinator, entry))
     entities.append(ExcludedZonesCountSensor(zones_coordinator, entry))
+    entities.append(ZonesAlarmMemoryCountSensor(zones_coordinator, entry))
 
     # GSM sensors
     entities.append(GSMSupplyVoltageSensor(gsm_coordinator, entry))

@@ -1,6 +1,6 @@
 from .coordinators import InimPrimeZonesUpdateCoordinator, InimPrimePartitionsUpdateCoordinator, InimPrimeSystemFaultsUpdateCoordinator
 from .const import DOMAIN, ZONES_COORDINATOR, PARTITIONS_COORDINATOR, SYSTEM_FAULTS_COORDINATOR
-from .entities.panel import SystemFaultBinarySensor, ZonesAlarmMemoryBinarySensor
+from .entities.panel import SystemFaultBinarySensor
 from .entities.partition import PartitionAlarmMemoryBinarySensor
 from .entities.zone import ZoneStateBinarySensor, ZoneAlarmMemoryBinarySensor
 from inim_prime_api.models.system_faults import EXPOSED_SYSTEM_FAULTS
@@ -26,7 +26,5 @@ async def async_setup_entry(hass, entry, async_add_entities) -> None:
         entities.append(
             SystemFaultBinarySensor(system_faults_coordinator, entry, exposedSystemFault)
         )
-
-    entities.append(ZonesAlarmMemoryBinarySensor(zones_coordinator, entry))
 
     async_add_entities(entities, update_before_add = True)

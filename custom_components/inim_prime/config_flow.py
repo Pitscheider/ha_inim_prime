@@ -4,9 +4,10 @@ import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, OptionsFlow
 from homeassistant.core import callback
-from homeassistant.data_entry_flow import section, SectionConfig
+from homeassistant.data_entry_flow import section
 from homeassistant.helpers.selector import TextSelector, TextSelectorType, TextSelectorConfig
 
+from inim_prime_api import InimPrimeClient
 from .const import (
     CONF_HOST,
     CONF_API_KEY,
@@ -34,8 +35,6 @@ from .const import (
     CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
     CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
 )
-
-from inim_prime_api import InimPrimeClient
 
 
 def build_connection_schema(

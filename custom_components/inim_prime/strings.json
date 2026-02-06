@@ -1,0 +1,39 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "INIM Prime Setup",
+        "description": "Enter your INIM Prime connection settings.",
+        "data": {
+          "serial_number": "Panel serial number",
+          "host": "Host / IP address",
+          "use_https": "Use HTTPS",
+          "api_key": "API Key",
+          "panel_log_events_fetch_limit": "Panel log events fetch limit",
+          "scan_intervals": "Scan intervals",
+          "zones_scan_interval": "Zones scan interval (seconds)",
+          "partitions_scan_interval": "Partitions scan interval (seconds)",
+          "gsm_scan_interval": "GSM scan interval (seconds)",
+          "system_faults_scan_interval": "System faults scan interval (seconds)",
+          "panel_log_events_scan_interval": "Panel log events scan interval (seconds)"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "INIM Prime Options",
+        "data": {
+          "panel_log_events_fetch_limit": "Panel log events fetch limit",
+          "scan_intervals": "Scan intervals",
+          "zones_scan_interval": "Zones scan interval (seconds)",
+          "partitions_scan_interval": "Partitions scan interval (seconds)",
+          "gsm_scan_interval": "GSM scan interval (seconds)",
+          "system_faults_scan_interval": "System faults scan interval (seconds)",
+          "panel_log_events_scan_interval": "Panel log events scan interval (seconds)"
+        }
+      }
+    }
+  }
+}

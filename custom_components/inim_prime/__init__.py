@@ -3,6 +3,7 @@ from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceEntry
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .coordinators import (
     InimPrimeGSMUpdateCoordinator,
@@ -93,7 +94,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
     )
 
-    coordinators = {
+    inim_prime_coordinators: dict[str, DataUpdateCoordinator] = {
         ZONES_COORDINATOR: InimPrimeZonesUpdateCoordinator(
             hass = hass,
             update_interval = timedelta(seconds = zones_scan_interval),
@@ -126,18 +127,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ),
     }
 
-    await coordinators[ZONES_COORDINATOR].async_config_entry_first_refresh()
-    await coordinators[PARTITIONS_COORDINATOR].async_config_entry_first_refresh()
-    await coordinators[SYSTEM_FAULTS_COORDINATOR].async_config_entry_first_refresh()
-    await coordinators[GSM_COORDINATOR].async_config_entry_first_refresh()
+    await inim_prime_coordinators[ZONES_COORDINATOR].async_config_entry_first_refresh()
+    await inim_prime_coordinators[PARTITIONS_COORDINATOR].async_config_entry_first_refresh()
+    await inim_prime_coordinators[SYSTEM_FAULTS_COORDINATOR].async_config_entry_first_refresh()
+    await inim_prime_coordinators[GSM_COORDINATOR].async_config_entry_first_refresh()
 
-    await coordinators[PANEL_LOG_EVENTS_COORDINATOR].async_startup()
-    await coordinators[PANEL_LOG_EVENTS_COORDINATOR].async_config_entry_first_refresh()
+    await inim_prime_coordinators[PANEL_LOG_EVENTS_COORDINATOR].async_startup()
+    await inim_prime_coordinators[PANEL_LOG_EVENTS_COORDINATOR].async_config_entry_first_refresh()
 
 
     hass.data[DOMAIN][entry.entry_id] = {
         "client": client,
-        "coordinators": coordinators,
+        "coordinators": inim_prime_coordinators,
     }
 
     await hass.config_entries.async_forward_entry_setups(
@@ -178,9 +179,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         data = hass.data[DOMAIN].pop(entry.entry_id)
 
         # Stop coordinators (optional but recommended)
-        coordinators = data.get("coordinators", {})
+        inim_prime_coordinators = data.get("coordinators", {})
 
-        for coordinator in coordinators.values():
+        for coordinator in inim_prime_coordinators.values():
             if coordinator and hasattr(coordinator, "async_shutdown"):
                 await coordinator.async_shutdown()
 

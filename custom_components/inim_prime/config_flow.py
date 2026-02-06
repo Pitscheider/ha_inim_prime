@@ -238,7 +238,12 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
 
                 return await self.async_step_options()
 
-        schema = vol.Schema(build_connection_schema())
+        schema = vol.Schema(
+            {
+                vol.Required(CONF_SERIAL_NUMBER): str,
+                **build_connection_schema(),
+            }
+        )
 
         return self.async_show_form(
             step_id = "user",

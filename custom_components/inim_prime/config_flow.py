@@ -271,7 +271,7 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
 
         schema = vol.Schema(
             {
-                **build_optional_schema
+                **build_optional_schema(),
             }
         )
 

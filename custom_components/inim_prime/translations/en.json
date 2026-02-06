@@ -15,12 +15,11 @@
       },
       "options": {
         "title": "INIM Prime Options",
-        "description": "Adjust polling and scan interval settings.",
         "data": {
           "panel_log_events_fetch_limit": "Panel Log Events Fetch Limit"
         },
         "data_description": {
-          "panel_log_events_fetch_limit": "Number of log events fetched per scan when new logs are detected. Default is recommended; the integration will automatically fetch more if needed."
+          "panel_log_events_fetch_limit": "\nNumber of log events fetched per scan when new logs are detected. Default is recommended\nThe integration will automatically fetch more if needed."
         },
         "sections": {
           "scan_intervals": {

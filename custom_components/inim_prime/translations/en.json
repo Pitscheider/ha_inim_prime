@@ -11,13 +11,20 @@
           "host": "Host / IP Address",
           "use_https": "Use HTTPS",
           "api_key": "API Key",
-          "panel_log_events_fetch_limit": "Panel Log Events Fetch Limit",
-          "scan_intervals": "Scan Intervals",
-          "zones_scan_interval": "Zones Scan Interval (seconds)",
-          "partitions_scan_interval": "Partitions Scan Interval (seconds)",
-          "gsm_scan_interval": "GSM Scan Interval (seconds)",
-          "system_faults_scan_interval": "System Faults Scan Interval (seconds)",
-          "panel_log_events_scan_interval": "Panel Log Events Scan Interval (seconds)"
+          "panel_log_events_fetch_limit": "Panel Log Events Fetch Limit"
+        },
+        "sections": {
+          "scan_intervals": {
+            "name": "Scan intervals",
+            "description": "How often Home Assistant polls each panel subsystem.",
+            "data": {
+              "zones_scan_interval": "Zones Scan Interval (seconds)",
+              "partitions_scan_interval": "Partitions Scan Interval (seconds)",
+              "gsm_scan_interval": "GSM Scan Interval (seconds)",
+              "system_faults_scan_interval": "System Faults Scan Interval (seconds)",
+              "panel_log_events_scan_interval": "Panel Log Events Scan Interval (seconds)"
+            }
+          }
         }
       },
       "reconfigure": {

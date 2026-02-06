@@ -269,7 +269,11 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
                 },
             )
 
-        schema = vol.Schema(build_optional_schema())
+        schema = vol.Schema(
+            {
+                **build_optional_schema
+            }
+        )
 
         return self.async_show_form(
             step_id = "options",

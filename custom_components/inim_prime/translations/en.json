@@ -16,7 +16,6 @@
       "options": {
         "title": "INIM Prime Options",
         "description": "Adjust polling and scan interval settings.",
-
         "data": {
           "panel_log_events_fetch_limit": "Panel Log Events Fetch Limit"
         },

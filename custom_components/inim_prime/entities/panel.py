@@ -9,12 +9,13 @@ from homeassistant.const import EntityCategory
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from ..const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
-from ..coordinators import InimPrimePanelLogEventsCoordinator, InimPrimeSystemFaultsUpdateCoordinator, InimPrimeZonesUpdateCoordinator, InimPrimePartitionsUpdateCoordinator
 from inim_prime_api.helpers.partitions import clear_all_partitions_alarm_memory
 from inim_prime_api.helpers.zones import include_all_zones
 from inim_prime_api.models.log_event import LogEvent
 from inim_prime_api.models.system_faults import SystemFault
+from ..const import INIM_PRIME_DEVICE_MANUFACTURER, CONF_SERIAL_NUMBER, DOMAIN
+from ..coordinators import InimPrimePanelLogEventsCoordinator, InimPrimeSystemFaultsUpdateCoordinator, \
+    InimPrimeZonesUpdateCoordinator, InimPrimePartitionsUpdateCoordinator
 
 
 def create_panel_device_info(
@@ -242,6 +243,7 @@ class ClearAllPartitionsAlarmMemoryButton(
 
         await self.coordinator.async_request_refresh()
 
+
 class ZonesAlarmMemoryCountSensor(
     CoordinatorEntity[InimPrimeZonesUpdateCoordinator],
     SensorEntity,
@@ -263,4 +265,28 @@ class ZonesAlarmMemoryCountSensor(
     def native_value(self) -> int | None:
         if self.coordinator.data:
             return sum(zone.alarm_memory for zone in self.coordinator.data.values())
+        return None
+
+
+class PartitionsAlarmMemoryCountSensor(
+    CoordinatorEntity[InimPrimePartitionsUpdateCoordinator],
+    SensorEntity,
+):
+    _attr_name = "Partitions Alarm Memory"
+    _attr_icon = "mdi:alarm-light"
+
+    def __init__(
+            self,
+            coordinator: InimPrimePartitionsUpdateCoordinator,
+            entry: ConfigEntry,
+    ):
+        super().__init__(coordinator)
+
+        self._attr_unique_id = f"{entry.data[CONF_SERIAL_NUMBER]}_partitions_alarm_memory_count"
+        self._attr_device_info = create_panel_device_info(entry)
+
+    @property
+    def native_value(self) -> int | None:
+        if self.coordinator.data:
+            return sum(partition.alarm_memory for partition in self.coordinator.data.values())
         return None

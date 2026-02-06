@@ -213,11 +213,13 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
             conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
             conf_panel_log_events_fetch_limit: int = user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT]
 
-            conf_zones_scan_interval = user_input[CONF_ZONES_SCAN_INTERVAL]
-            conf_partitions_scan_interval = user_input[CONF_PARTITIONS_SCAN_INTERVAL]
-            conf_gsm_scan_interval = user_input[CONF_GSM_SCAN_INTERVAL]
-            conf_system_faults_scan_interval = user_input[CONF_SYSTEM_FAULTS_SCAN_INTERVAL]
-            conf_panel_log_events_scan_interval = user_input[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
+            scan_intervals = user_input["scan_intervals"]
+
+            conf_zones_scan_interval = scan_intervals[CONF_ZONES_SCAN_INTERVAL]
+            conf_partitions_scan_interval = scan_intervals[CONF_PARTITIONS_SCAN_INTERVAL]
+            conf_gsm_scan_interval = scan_intervals[CONF_GSM_SCAN_INTERVAL]
+            conf_system_faults_scan_interval = scan_intervals[CONF_SYSTEM_FAULTS_SCAN_INTERVAL]
+            conf_panel_log_events_scan_interval = scan_intervals[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
 
             await self.async_set_unique_id(conf_serial_number)
             self._abort_if_unique_id_configured()

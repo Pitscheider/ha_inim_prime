@@ -69,23 +69,26 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     ###
     ### Coordinators
     ###
-    zones_scan_interval = entry.options.get(
+
+    scan_intervals = entry.options.get("scan_intervals", {})
+
+    zones_scan_interval = scan_intervals.get(
         CONF_ZONES_SCAN_INTERVAL,
         CONF_ZONES_SCAN_INTERVAL_DEFAULT,
     )
-    partitions_scan_interval = entry.options.get(
+    partitions_scan_interval = scan_intervals.get(
         CONF_PARTITIONS_SCAN_INTERVAL,
         CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
     )
-    gsm_scan_interval = entry.options.get(
+    gsm_scan_interval = scan_intervals.get(
         CONF_GSM_SCAN_INTERVAL,
         CONF_GSM_SCAN_INTERVAL_DEFAULT,
     )
-    system_faults_scan_interval = entry.options.get(
+    system_faults_scan_interval = scan_intervals.get(
         CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
         CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
     )
-    panel_log_events_scan_interval = entry.options.get(
+    panel_log_events_scan_interval = scan_intervals.get(
         CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
         CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
     )

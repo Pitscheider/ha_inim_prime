@@ -127,14 +127,12 @@ Firstly, paste the serial number you have obtained during the panel configuratio
 Then, in the `host` you should type the IP address or the hostname of your Inim Prime panel.   
 In case your Inim Prime panel uses DHCP, be sure to reserve a static IP for the panel or set up a DNS record for it (read the `Check network settings` section above).   
 I suggest to keep the `use_https` flag enabled as it enables encrypted communication between Home Assistant and the Inim Prime panel.   
-In the `api_key` field just paste the API Key you obtained in Prime/STUDIO as described above.   
-Regarding the `panel_log_events_fetch_limit` selector, you should probably use the default value.   
-Changing this value affects how many logs are obtained at each scan in case new logs are fetched. Don't worry, in case the value chosen here is not enough, the integration will fetch the maximum number of events that is allowed, in order to find the maximum number of new logs.   
-Once you have filled all the mandatory fields, just press on `Submit`.   
+In the `api_key` field just paste the API Key you obtained in Prime/STUDIO as described above.
+Once you have filled in the mandatory connection parameters you can proceed with the configuration of the options. You can discover more about the options available in the Options section available below. If unsure, leave the default settings, and complete the configuration.
 The initial configuration might take a while. It is expected, as the Inim Prime panel is not exactly fast 😅.   
 ### Finishing the setup   
 Once the initial configuration has been completed you should be able to see all the devices created by the integration that you might rename and assign to a Home Assistant Area. Once you have finished, just press on `Finish`.   
-# Reconfigure the integration   
+# Reconfigure
 In case you need to update one of those fields:   
 - `host`   
 - `use_https`   
@@ -142,25 +140,53 @@ In case you need to update one of those fields:
    
 Open the integration, click the three dots on the left corresponding to your panel (its default name is `INIM Prime (serial_number)`) and press `Reconfigure`.   
 There you should be able to change the desired parameters.   
-# Change integration options   
-In case you want to update some of the available options of the integration, click on the gear icon on the left corresponding to your panel (its default name is `INIM Prime (serial_number)`).   
-There you should be able to update the desired parameters.   
+# Options   
+To adjust the integration settings, click the gear icon next to your panel in Home Assistant (by default it is named `INIM Prime (serial_number)`).   
+In the options page, you can configure the following parameters:
+## Panel Log Events Fetch Limit
+Controls the maximum number of log events retrieved when new logs are detected.
+- Default value is recommended.
+- If the number of new logs equals this value, the integration will automatically fetch the maximum amount of events to ensure nothing is missed.
+- This setting does not provide real-time events, as log fetching is asynchronous.
+## Scan Intervals
+These settings control how often Home Assistant sends API requests to the panel. Each interval affects a different set of entities (check the section below to know exactly what entities are affected by each interval):
+- **Zones Scan Interval** (default 5s)  
+How often the status of all zones is polled.
+- **Partitions Scan Interval** (default 10s)  
+How often the status of partitions is polled.
+- **GSM Scan Interval** (default 30s)  
+How often GSM status is polled.
+- **System Faults Scan Interval** (default 15s)  
+How often system faults are polled.
+- **Panel Log Events Scan Interval** (default 15s)  
+How often new log events are fetched.
+
+⚠️ Lower values mean more frequent polling and higher API load.
+
 # Devices available   
 This section provides a list of the devices that are created by the integration with their entities.   
 The devices do not currently support all the Inim Prime functions provided by the API, since it does not work correctly with the current firmware version.   
-In the future the devices might change as well as their entities, paraphs with new features.   
-Information regarding the state of the panel are updated every 10 seconds for most of the entities.   
-An exception is the Log Events one, that is updated every 20 seconds.   
+In the future the devices might change as well as their entities, paraphs with new features.
 ## Inim Prime Panel   
 This device represents the panel itself and provides different entities related to it.   
 ### Sensors   
 - **Excluded Zones**   
-    This numerical sensor is a helper that shows the number of currently excluded zones.   
+    Scan Interval: _Zones_   
+    This numerical sensor is a helper that shows the number of currently excluded zones.  
+- **Partitions Alarm Memory**   
+    Scan Interval: _Partitions_   
+    This numerical sensor is a helper that shows the number of partitions with an active alarm memory.
+    It can be used to check if the alarm has been triggered (responsiveness will depend on the Scan Interval).
+- **Zones Alarm Memory**   
+    Scan Interval: _Zones_   
+    This numerical sensor is a helper that shows the number of zones with an active alarm memory. 
+    It can be used to check if the alarm has been triggered (responsiveness will depend on the Scan Interval).
    
 ### Events   
 - **Log Events**   
+    Scan Interval: _Panel Log Events_   
     This event logger is used to track the logs provided by the panel.
-It DOES NOT provide events in real time, since those are added asynchronously every 20 seconds.
+It DOES NOT provide events in real time, since those are added asynchronously.
 Log Events are provided with the panel in a non-optimal way, in fact every fetch needs to specify a number of logs that should be retrieved and there is no way to only ask for new events.
 In order to determine which logs are new, the integration perform a check between the last fetch and the current one, picking only the new logs. The logic is pretty complex, but is described quite well in the source code.
 To reduce the number of logs retrieved at the end of every cycle, the integration only fetch 3 logs per cycle. It uses this small pool of logs to determine if new logs appeared. This way most of the time, when no new log will be there, the operation will be fast.
@@ -170,43 +196,51 @@ It is important to note that every log has the same category `generic`, since I 
 The event entity has been chosen, since it is the most suitable across the Home Assistant one. Still, it is a workaround to store logs, since Home Assistant does not have a better way to do so (or at least I haven't found it).   
    
 ### Configuration   
-- **Clear All Alarm Memories**   
+- **Clear All Alarm Memories**  
+    Scan Interval: _None_   
     This button clears all the partitions alarm memories. It is a helper.   
-- **Include All Zones**   
+- **Include All Zones**  
+    Scan Interval: _None_   
     This button include every excluded zone. It is a helper.   
    
 ### Diagnostic   
 - **Panel faults**   
+    Scan Interval: _System Faults_   
     The panel device has 14 fault detection diagnostic sensors, that are provided by the API. I tested some of them, and they were correctly updated, but I wasn't able to trigger all of them.
 If you test one of them, and it correctly appears (or not) in Home Assistant, please create an Issue to let me know.   
 - **Supply Voltage**   
+    Scan Interval: _System Faults_   
     This diagnostic sensor shows the current voltage of the panel.   
    
 ## GSM   
 This device represents the GSM, and it provides some information regarding it.   
 ### Diagnostic   
 - **Credit**   
+    Scan Interval: _GSM_   
     This entity should show the credit of the GSM SIM. It currently is a String since I have not been able to test it with an actual value.
 If you see a value that differs from `Unknown` please make an issue so that I can map it to a numerical value.   
 - **Operator**   
+    Scan Interval: _GSM_   
     This entity shows the current GSM Operator as a string.   
 - **Signal Strength**   
+    Scan Interval: _GSM_   
     This entity shows the GSM signal strength in percentage.   
 - **Supply Voltage**   
+    Scan Interval: _GSM_   
     This entity shows the current voltage of the GSM.   
    
-## 
-Zone   
+## Zone   
 This device type represents a zone of the Inim Prime alarm panel. The device will be named this way: `Zone zone_name`.   
 You can definitely change the name of every zone to make it represent better what it is. Zones have their own ids, so name changing is absolutely possible.   
 ### Controls   
 - **Exclusion**   
+    Scan Interval: _Zones_   
     This switch shows the state of exclusion of the entity. It also permits to change the exclusion status.   
    
 ### Sensors   
 - **State**   
+    Scan Interval: _Zones_   
     This sensor shows one of the 4 possible zone states:
-   
     - FAULT   
     - READY   
     - ALARM   
@@ -214,21 +248,25 @@ You can definitely change the name of every zone to make it represent better wha
    
     The API, in fact, provides those 4 possible states.   
 - **Binary sensor**   
+    Scan Interval: _Zones_   
     This binary sensor, which automatically gets the same name of the device, represents a helper for the state entity.   
     In fact, it is probably more useful for users to just have a binary sensor for each zone that represents Open/Closed, Detected/Not Detected, etc.   
     It is advised to change this entity type for each zone and adapt it to its real role. It is possible to do so by clicking on the entity, pressing the gear icon and then select the right type in `Show as` menu. Once you have updated the entity just press on `Update`.   
    
 ### Diagnostic   
 - **Alarm Memory**   
+    Scan Interval: _Zones_   
     This entity shows if the zone has an active Alarm Memory.   
    
 ## Partition   
 This device type represents a partition of the Inim Prime alarm panel. The device will be named this way: `Partition partition_name`.   
 You can definitely change the name of every partition to make it represent better what it is. Partitions have their own ids, so name changing is absolutely possible.   
 ### Controls   
-- **Clear Alarm Memory**   
+- **Clear Alarm Memory**  
+    Scan Interval: _None_   
     This button clear the partition's alarm memory.   
 - **Mode**   
+    Scan Interval: _Partitions_   
     This entity shows the partitions current mode. It also allows to specify a new mode.   
     There are 4 possible modes:   
     - DISARMED   
@@ -238,6 +276,7 @@ You can definitely change the name of every partition to make it represent bette
    
 ### Sensors   
 - **State**   
+    Scan Interval: _Partitions_   
     This entity represents the state of the partition.   
     Three values are possible:   
     - ALARM   
@@ -246,6 +285,7 @@ You can definitely change the name of every partition to make it represent bette
    
 ### Diagnostic   
 - **Alarm Memory**   
+    Scan Interval: _Partitions_   
     This sensor represents if the partition has an active Alarm Memory.   
    
 # Suggested configuration   

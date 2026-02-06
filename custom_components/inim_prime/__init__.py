@@ -179,7 +179,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
         for coordinator in coordinators.values():
             if coordinator and hasattr(coordinator, "async_shutdown"):
-                coordinator.async_shutdown()
+                await coordinator.async_shutdown()
 
         # Close API client
         await data["client"].close()

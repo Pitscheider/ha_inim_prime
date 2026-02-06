@@ -19,16 +19,26 @@
         "data": {
           "panel_log_events_fetch_limit": "Panel Log Events Fetch Limit"
         },
+        "data_description": {
+          "panel_log_events_fetch_limit": "Number of log events fetched per scan when new logs are detected. Default is recommended; the integration will automatically fetch more if needed."
+        },
         "sections": {
           "scan_intervals": {
             "name": "Scan intervals",
-            "description": "How often Home Assistant polls each panel subsystem.",
+            "description": "Controls how often Home Assistant sends API requests to the panel (lower values increase traffic). For details on which entities each interval affects, see the integration README.",
             "data": {
               "zones_scan_interval": "Zones Scan Interval (seconds)",
               "partitions_scan_interval": "Partitions Scan Interval (seconds)",
               "gsm_scan_interval": "GSM Scan Interval (seconds)",
               "system_faults_scan_interval": "System Faults Scan Interval (seconds)",
               "panel_log_events_scan_interval": "Panel Log Events Scan Interval (seconds)"
+            },
+            "data_description": {
+              "zones_scan_interval": "How often Home Assistant sends API requests to fetch zone status.",
+              "partitions_scan_interval": "How often Home Assistant sends API requests to fetch partition status.",
+              "gsm_scan_interval": "How often Home Assistant sends API requests to fetch GSM status.",
+              "system_faults_scan_interval": "How often Home Assistant sends API requests to fetch system faults.",
+              "panel_log_events_scan_interval": "How often Home Assistant sends API requests to fetch new panel log events."
             }
           }
         }
@@ -56,20 +66,29 @@
       "init": {
         "title": "INIM Prime Options",
         "description": "Adjust polling and scan interval settings.",
-
         "data": {
           "panel_log_events_fetch_limit": "Panel Log Events Fetch Limit"
+        },
+        "data_description": {
+          "panel_log_events_fetch_limit": "Number of log events fetched per scan when new logs are detected. Default is recommended; the integration will automatically fetch more if needed."
         },
         "sections": {
           "scan_intervals": {
             "name": "Scan intervals",
-            "description": "How often Home Assistant polls each panel subsystem.",
+            "description": "Controls how often Home Assistant sends API requests to the panel (lower values increase traffic). For details on which entities each interval affects, see the integration README.",
             "data": {
               "zones_scan_interval": "Zones Scan Interval (seconds)",
               "partitions_scan_interval": "Partitions Scan Interval (seconds)",
               "gsm_scan_interval": "GSM Scan Interval (seconds)",
               "system_faults_scan_interval": "System Faults Scan Interval (seconds)",
               "panel_log_events_scan_interval": "Panel Log Events Scan Interval (seconds)"
+            },
+            "data_description": {
+              "zones_scan_interval": "How often Home Assistant sends API requests to fetch zone status.",
+              "partitions_scan_interval": "How often Home Assistant sends API requests to fetch partition status.",
+              "gsm_scan_interval": "How often Home Assistant sends API requests to fetch GSM status.",
+              "system_faults_scan_interval": "How often Home Assistant sends API requests to fetch system faults.",
+              "panel_log_events_scan_interval": "How often Home Assistant sends API requests to fetch new panel log events."
             }
           }
         }

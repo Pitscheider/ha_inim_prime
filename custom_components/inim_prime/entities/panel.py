@@ -206,8 +206,10 @@ class IncludeAllZonesButton(
         )
 
     async def async_press(self) -> None:
+        zones = await self.coordinator.client.get_zones_status()
+
         await include_all_zones(
-            zones = self.coordinator.data,
+            zones = zones,
             client = self.coordinator.client,
         )
 
@@ -236,8 +238,10 @@ class ClearAllPartitionsAlarmMemoryButton(
         )
 
     async def async_press(self) -> None:
+        partitions = await self.coordinator.client.get_partitions_status()
+
         await clear_all_partitions_alarm_memory(
-            partitions = self.coordinator.data,
+            partitions = partitions,
             client = self.coordinator.client,
         )
 

@@ -201,24 +201,18 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
     VERSION = 1
     MINOR_VERSION = 0
 
+    def __init__(self):
+        self._connection_data: dict[str, Any] = {}
+
     async def async_step_user(self, user_input: dict[str, Any] | None = None):
-        """Handle the initial step initiated by the user."""
+        """Step 1: Connection parameters."""
         errors = {}
 
         if user_input is not None:
+            conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
             conf_host: str = user_input[CONF_HOST].strip()
             conf_api_key: str = user_input[CONF_API_KEY].strip()
             conf_use_https: bool = user_input.get(CONF_USE_HTTPS, True)
-            conf_serial_number: str = user_input[CONF_SERIAL_NUMBER].strip()
-            conf_panel_log_events_fetch_limit: int = user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT]
-
-            scan_intervals = user_input["scan_intervals"]
-
-            conf_zones_scan_interval = scan_intervals[CONF_ZONES_SCAN_INTERVAL]
-            conf_partitions_scan_interval = scan_intervals[CONF_PARTITIONS_SCAN_INTERVAL]
-            conf_gsm_scan_interval = scan_intervals[CONF_GSM_SCAN_INTERVAL]
-            conf_system_faults_scan_interval = scan_intervals[CONF_SYSTEM_FAULTS_SCAN_INTERVAL]
-            conf_panel_log_events_scan_interval = scan_intervals[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL]
 
             await self.async_set_unique_id(conf_serial_number)
             self._abort_if_unique_id_configured()
@@ -234,36 +228,47 @@ class InimPrimeConfigFlow(config_entries.ConfigFlow, domain = DOMAIN):
             except Exception:
                 errors["base"] = "cannot_connect"
             else:
-                return self.async_create_entry(
-                    title = f"INIM Prime ({conf_serial_number})",
-                    data = {
-                        CONF_SERIAL_NUMBER: conf_serial_number,
-                        CONF_HOST: conf_host,
-                        CONF_API_KEY: conf_api_key,
-                        CONF_USE_HTTPS: conf_use_https,
-                    },
-                    options = {
-                        CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: conf_panel_log_events_fetch_limit,
-                        CONF_ZONES_SCAN_INTERVAL: conf_zones_scan_interval,
-                        CONF_PARTITIONS_SCAN_INTERVAL: conf_partitions_scan_interval,
-                        CONF_GSM_SCAN_INTERVAL: conf_gsm_scan_interval,
-                        CONF_SYSTEM_FAULTS_SCAN_INTERVAL: conf_system_faults_scan_interval,
-                        CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL: conf_panel_log_events_scan_interval,
-                    },
-                )
+                # Save step1 results temporarily
+                self._connection_data = {
+                    CONF_SERIAL_NUMBER: conf_serial_number,
+                    CONF_HOST: conf_host,
+                    CONF_API_KEY: conf_api_key,
+                    CONF_USE_HTTPS: conf_use_https,
+                }
 
-        data_schema = vol.Schema(
-            {
-                vol.Required(CONF_SERIAL_NUMBER): str,
-                **build_connection_schema(),
-                **build_optional_schema(),
-            }
-        )
+                return await self.async_step_options()
+
+        schema = vol.Schema(build_connection_schema())
 
         return self.async_show_form(
             step_id = "user",
-            data_schema = data_schema,
+            data_schema = schema,
             errors = errors,
+        )
+
+    async def async_step_options(self, user_input: dict[str, Any] | None = None):
+        """Step 2: Options / scan intervals."""
+        if user_input is not None:
+            scan_intervals = user_input["scan_intervals"]
+
+            return self.async_create_entry(
+                title = f"INIM Prime ({self._connection_data[CONF_SERIAL_NUMBER]})",
+                data = self._connection_data,
+                options = {
+                    CONF_PANEL_LOG_EVENTS_FETCH_LIMIT: user_input[CONF_PANEL_LOG_EVENTS_FETCH_LIMIT],
+                    CONF_ZONES_SCAN_INTERVAL: scan_intervals[CONF_ZONES_SCAN_INTERVAL],
+                    CONF_PARTITIONS_SCAN_INTERVAL: scan_intervals[CONF_PARTITIONS_SCAN_INTERVAL],
+                    CONF_GSM_SCAN_INTERVAL: scan_intervals[CONF_GSM_SCAN_INTERVAL],
+                    CONF_SYSTEM_FAULTS_SCAN_INTERVAL: scan_intervals[CONF_SYSTEM_FAULTS_SCAN_INTERVAL],
+                    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL: scan_intervals[CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL],
+                },
+            )
+
+        schema = vol.Schema(build_optional_schema())
+
+        return self.async_show_form(
+            step_id = "options",
+            data_schema = schema,
         )
 
     async def async_step_reconfigure(

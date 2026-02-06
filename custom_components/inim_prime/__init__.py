@@ -2,9 +2,36 @@ from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.device_registry import DeviceEntry
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
+from inim_prime_api import InimPrimeClient
+from .const import (
+    CONF_SERIAL_NUMBER,
+    DOMAIN,
+    INIM_PRIME_DEVICE_MANUFACTURER,
+
+    # --- Coordinators ---
+    PANEL_LOG_EVENTS_COORDINATOR,
+    ZONES_COORDINATOR,
+    PARTITIONS_COORDINATOR,
+    GSM_COORDINATOR,
+    SYSTEM_FAULTS_COORDINATOR,
+
+    # --- Scan interval config keys ---
+    CONF_ZONES_SCAN_INTERVAL,
+    CONF_PARTITIONS_SCAN_INTERVAL,
+    CONF_GSM_SCAN_INTERVAL,
+    CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
+    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
+
+    # --- Defaults (custom per coordinator) ---
+    CONF_ZONES_SCAN_INTERVAL_DEFAULT,
+    CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
+    CONF_GSM_SCAN_INTERVAL_DEFAULT,
+    CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
+    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
+)
 from .coordinators import (
     InimPrimeGSMUpdateCoordinator,
     InimPrimePartitionsUpdateCoordinator,
@@ -12,35 +39,6 @@ from .coordinators import (
     InimPrimePanelLogEventsCoordinator,
     InimPrimeSystemFaultsUpdateCoordinator,
 )
-
-from inim_prime_api import InimPrimeClient
-from .const import (
-    CONF_SERIAL_NUMBER,
-    DOMAIN,
-
-# --- Coordinators ---
-    PANEL_LOG_EVENTS_COORDINATOR,
-    ZONES_COORDINATOR,
-    PARTITIONS_COORDINATOR,
-    GSM_COORDINATOR,
-    SYSTEM_FAULTS_COORDINATOR,
-
-# --- Scan interval config keys ---
-    CONF_ZONES_SCAN_INTERVAL,
-    CONF_PARTITIONS_SCAN_INTERVAL,
-    CONF_GSM_SCAN_INTERVAL,
-    CONF_SYSTEM_FAULTS_SCAN_INTERVAL,
-    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL,
-
-# --- Defaults (custom per coordinator) ---
-    CONF_ZONES_SCAN_INTERVAL_DEFAULT,
-    CONF_PARTITIONS_SCAN_INTERVAL_DEFAULT,
-    CONF_GSM_SCAN_INTERVAL_DEFAULT,
-    CONF_SYSTEM_FAULTS_SCAN_INTERVAL_DEFAULT,
-    CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
-)
-
-from .entities.panel import create_panel_device_info
 
 PLATFORMS = [
     "binary_sensor",
@@ -58,7 +56,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     entry.async_on_unload(entry.add_update_listener(async_reload_entry))
 
-    create_panel_device_info(entry)
+
+    # --- Register the panel device ---
+    device_registry = dr.async_get(hass)
+    device_registry.async_get_or_create(
+        config_entry_id = entry.entry_id,
+        identifiers = {(DOMAIN, entry.data[CONF_SERIAL_NUMBER])},
+        name = "Inim Prime Panel",
+        model = "Prime Panel",
+        manufacturer = INIM_PRIME_DEVICE_MANUFACTURER,
+        serial_number = entry.data[CONF_SERIAL_NUMBER],
+    )
 
     host = entry.data["host"]
     api_key = entry.data["api_key"]
@@ -94,7 +102,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         CONF_PANEL_LOG_EVENTS_SCAN_INTERVAL_DEFAULT,
     )
 
-    inim_prime_coordinators: dict[str, DataUpdateCoordinator] = {
+    inim_prime_coordinators = {
         ZONES_COORDINATOR: InimPrimeZonesUpdateCoordinator(
             hass = hass,
             update_interval = timedelta(seconds = zones_scan_interval),

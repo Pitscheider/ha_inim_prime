@@ -19,5 +19,3 @@ async def async_setup_entry(hass, entry, async_add_entities):
     entities.append(ClearAllPartitionsAlarmMemoryButton(partitions_coordinator, entry))
 
     async_add_entities(entities, update_before_add = True)
-
-    async_add_entities(entities, update_before_add=True)

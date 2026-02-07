@@ -125,7 +125,7 @@ To add the integration go to `Settings` → `Devices & services` and click on `A
 In order to add the integration, some information regarding the panel and the integration behaviour are required.   
 Firstly, paste the serial number you have obtained during the panel configuration in the `serial_number` field. Double check it, as it is important that you have written it correctly.   
 Then, in the `host` you should type the IP address or the hostname of your Inim Prime panel.   
-In case your Inim Prime panel uses DHCP, be sure to reserve a static IP for the panel or set up a DNS record for it (read the `Check network settings` section above).   
+In case your Inim Prime panel uses DHCP, be sure to reserve a static IP for the panel or set up a DNS record for it (read the [Check network settings](https://github.com/Pitscheider/ha_inim_prime?tab=readme-ov-file#check-network-settings) section above).   
 I suggest to keep the `use_https` flag enabled as it enables encrypted communication between Home Assistant and the Inim Prime panel.   
 In the `api_key` field just paste the API Key you obtained in Prime/STUDIO as described above.
 Once you have filled in the mandatory connection parameters you can proceed with the configuration of the options. You can discover more about the options available in the [Options](https://github.com/Pitscheider/ha_inim_prime?tab=readme-ov-file#options) section available below. If unsure, leave the default settings, and complete the configuration.

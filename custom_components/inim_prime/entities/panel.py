@@ -167,6 +167,7 @@ class ExcludedZonesCountSensor(
     SensorEntity,
 ):
     _attr_name = "Excluded Zones"
+    _attr_icon = "mdi:cancel"
 
     def __init__(
             self,

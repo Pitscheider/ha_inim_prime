@@ -128,7 +128,7 @@ Then, in the `host` you should type the IP address or the hostname of your Inim 
 In case your Inim Prime panel uses DHCP, be sure to reserve a static IP for the panel or set up a DNS record for it (read the `Check network settings` section above).   
 I suggest to keep the `use_https` flag enabled as it enables encrypted communication between Home Assistant and the Inim Prime panel.   
 In the `api_key` field just paste the API Key you obtained in Prime/STUDIO as described above.
-Once you have filled in the mandatory connection parameters you can proceed with the configuration of the options. You can discover more about the options available in the Options section available below. If unsure, leave the default settings, and complete the configuration.
+Once you have filled in the mandatory connection parameters you can proceed with the configuration of the options. You can discover more about the options available in the [Options](https://github.com/Pitscheider/ha_inim_prime?tab=readme-ov-file#options) section available below. If unsure, leave the default settings, and complete the configuration.
 The initial configuration might take a while. It is expected, as the Inim Prime panel is not exactly fast 😅.   
 ### Finishing the setup   
 Once the initial configuration has been completed you should be able to see all the devices created by the integration that you might rename and assign to a Home Assistant Area. Once you have finished, just press on `Finish`.   

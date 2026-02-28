@@ -10,6 +10,5 @@
     "@Pitscheider"
   ],
   "config_flow": true,
-  "iot_class": "local_polling",
-  "logo": "icon.png"
+  "iot_class": "local_polling"
 }

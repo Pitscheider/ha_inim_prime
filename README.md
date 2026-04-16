@@ -27,7 +27,7 @@ In order to use this integration you need an Inim Prime panel with the PrimeLAN 
 The manual for the setup of the Inim PrimeLAN card can be found there: [Inim PrimeLAN manual](https://www.manualslib.com/manual/3494645/Inim-Primelan.html?page=4#manual).   
 ## Prepare the Inim Prime panel   
 In order to use this integration, you need to edit you panel configuration. You can do so by installing the Prime/STUDIO software on Windows.   
-You can download the latest version of the software there: [Inim Prime/STUDIO](https://download.sicurit.cz/EZS/INIM/_Prime/Prime%20Studio/).   
+You can download the latest version of the software there: [Inim Prime/STUDIO](https://archive.org/details/primestudio_4002_setup).   
 ### Connect to the panel   
 Once you have installed the software, open it, and you should have this view:
 

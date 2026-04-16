@@ -39,7 +39,7 @@ Click on `Open panel connected`, and then select `Prime LAN`:
 
 Type the panel IP and password and click on `Next`.   
 Once the communication channel has been checked, you should be able to see that a panel as been detected, the firmware version and the serial number.   
-It is **FUNDAMENTAL** to copy the serial number correctly from that view and store it, since it will be needed later on during the configuration in Home Assistant.   
+It is **HIGHLY RECCOMENDED** to copy the serial number correctly from that view and store it, since it will be useful later on during the configuration in Home Assistant.   
 Once you have copied the serial number, you can click on `Open the panel`.   
 ### Make a backup of the configuration   
 The first thing I strongly advise you to do, if you haven't already is making a copy of your panel configuration.   
@@ -123,8 +123,9 @@ Once you have installed the integration following the steps above, you can proce
 To add the integration go to `Settings` → `Devices & services` and click on `Add integration`. There, search for `Inim Prime` and click on the integration.   
 ### Initial configuration   
 In order to add the integration, some information regarding the panel and the integration behaviour are required.   
-Firstly, paste the serial number you have obtained during the panel configuration in the `serial_number` field. Double check it, as it is important that you have written it correctly.   
-Then, in the `host` you should type the IP address or the hostname of your Inim Prime panel.   
+Firstly, paste the serial number you have obtained during the panel configuration in the `serial_number` field. Double check it, as it is important that you have written it correctly. At the current state the `serial_number` field is not checked by the integration, so that might be any string value you decide. However it is highly reccomended to paste a unique identifier, since this field cannot be changed later and it is used to differentiate multiple setups (in case you want to manage multiple Prime panels). Moreover it is used to determine where to store data related to the integration. For those reasons, I strongly suggest to use the panel's serial number. In case you don't have access to it, the network MAC Address might be a good alternative.
+
+Then, in the `host` field you should type the IP address or the hostname of your Inim Prime panel.   
 In case your Inim Prime panel uses DHCP, be sure to reserve a static IP for the panel or set up a DNS record for it (read the [Check network settings](https://github.com/Pitscheider/ha_inim_prime?tab=readme-ov-file#check-network-settings) section above).   
 I suggest to keep the `use_https` flag enabled as it enables encrypted communication between Home Assistant and the Inim Prime panel.   
 In the `api_key` field just paste the API Key you obtained in Prime/STUDIO as described above.

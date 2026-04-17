@@ -37,7 +37,7 @@ Click on `Open panel connected`, and then select `Prime LAN`:
 
 <img width="905" height="495" alt="img01" src="https://github.com/user-attachments/assets/9507ebab-88d9-46d6-84a3-f51cedd98854" />
 
-Type the panel IP and password and click on `Next`.   
+Type the panel IP and password (default one is "pass") and click on `Next`.   
 Once the communication channel has been checked, you should be able to see that a panel as been detected, the firmware version and the serial number.   
 It is **HIGHLY RECCOMENDED** to copy the serial number correctly from that view and store it, since it will be useful later on during the configuration in Home Assistant.   
 Once you have copied the serial number, you can click on `Open the panel`.   
